@@ -17,7 +17,7 @@ RestComm jDiameter provides an Open Source Java implementation of the Diameter s
 
 ## Supported Applications
 
-The supported applications includes Base, Credit-Control Application, Ro (Online Charging), Rf (Offline Charging), Sh, Gx, Cx/Dx, Gq', S6a and many more. It also features an extensible architecture that allows additional Diameter application modules to be plugged in.
+The supported applications includes Base, Credit-Control Application, Ro (Online Charging), Rf (Offline Charging), Sh, Gx, SLh and SLG for LTE location services, Cx/Dx, Gq', S6a, S13 and more. It also features an extensible architecture that allows additional Diameter application modules to be plugged in.
 
 ## Advanced Features
 
