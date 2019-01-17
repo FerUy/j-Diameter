@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="6.18">
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/timer/ReplicatedTimerFacilityImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/timer/DiameterTimerTaskData.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/auth/ServerAuthSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/ro/ServerRoSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/rf/ServerRfSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/sh/ShServerSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/cxdx/ServerCxDxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/gx/ServerGxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/slh/ServerSLhSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/slg/ServerSLgSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/s13/ServerS13SessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/rx/ServerRxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/cca/ServerCCASessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/server/acc/ServerAccSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/auth/AuthReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/ro/RoReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/rf/RfReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/sh/ShReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/cxdx/CxDxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/cxdx/CxDxReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/gx/GxReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/slh/SLhReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/slh/SLhSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/slg/SLgReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/slg/SLgSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/s13/S13ReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/s13/S13SessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/rx/RxReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/cca/CCAReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/AppSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/common/acc/AccReplicatedSessionDataFactory.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/data/ReplicatedSessionDatasource.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/auth/ClientAuthSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/ro/ClientRoSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/rf/ClientRfSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/sh/ShClientSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/cxdx/ClientCxDxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/gx/ClientGxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/slh/ClientSLhSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/slg/ClientSLgSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/s13/ClientS13SessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/rx/ClientRxSessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/cca/ClientCCASessionDataReplicatedImpl.java">
+</file>
+<file name="/Users/fernando/Documents/TRG-BECONNECT/Workspace/GitLab/jDiameter/jdiameter/core/jdiameter-ha/impl/src/main/java/org/mobicents/diameter/impl/ha/client/acc/ClientAccSessionDataReplicatedImpl.java">
+</file>
+</checkstyle>

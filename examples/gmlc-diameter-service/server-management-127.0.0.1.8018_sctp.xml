@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<connectdelay value="5000"/>
+<servers>
+	<server name="localhost:8018" started="false" hostAddress="127.0.0.1" hostPort="8018" ipChannelType="0" acceptAnonymousConnections="true" maxConcurrentConnectionsCount="10" extraHostAddresseSize="0">
+		<associations>
+			<string value="localhost:8018"/>
+		</associations>
+	</server>
+</servers>
+<associations>
+	<name value="localhost:8018"/>
+	<association name="localhost:8018" assoctype="SERVER" hostPort="0" peerAddress="127.0.0.1" peerPort="8018" serverName="localhost:8018" ipChannelType="0" extraHostAddresseSize="0"/>
+</associations>

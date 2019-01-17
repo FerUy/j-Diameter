@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<connectdelay value="1000"/>
+<servers/>
+<associations>
+	<name value="127.0.0.1.0_127.0.0.1.8011"/>
+	<association name="127.0.0.1.0_127.0.0.1.8011" assoctype="CLIENT" hostAddress="127.0.0.1" hostPort="0" peerAddress="127.0.0.1" peerPort="8011" ipChannelType="0" extraHostAddresseSize="0"/>
+</associations>

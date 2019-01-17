@@ -1,0 +1,105 @@
+Manifest-Version: 1.0
+Bundle-Description: Restcomm :: Parent pom for 2.x releases
+Implementation-Title: org.mobicents.servers.diameter.examples:location
+ -server-simulator
+Bundle-License: http://www.gnu.org/licenses/lgpl-2.1.html
+Bundle-SymbolicName: org.mobicents.servers.diameter.examples.location-
+ server-simulator
+Implementation-Version: 1.0.0
+Built-By: fernando
+Bundle-ManifestVersion: 2
+Bnd-LastModified: 1546552601729
+Implementation-Vendor-Id: TeleStax, Inc.
+Import-Package: com.google.gson,org.apache.log4j,org.jdiameter.api,org
+ .jdiameter.api.app,org.jdiameter.api.sh,org.jdiameter.api.sh.events,o
+ rg.jdiameter.api.slg,org.jdiameter.api.slg.events,org.jdiameter.api.s
+ lh,org.jdiameter.api.slh.events,org.jdiameter.api.validation,org.jdia
+ meter.client.api,org.jdiameter.client.impl.helpers,org.jdiameter.comm
+ on.api.app,org.jdiameter.common.impl.app.sh,org.jdiameter.common.impl
+ .app.slg,org.jdiameter.common.impl.app.slh,org.jdiameter.common.impl.
+ validation,org.jdiameter.server.impl,org.jdiameter.server.impl.app.sh
+ ,org.jdiameter.server.impl.app.slg,org.jdiameter.server.impl.app.slh,
+ org.jdiameter.server.impl.helpers,org.mobicents.diameter.dictionary,o
+ rg.mobicents.protocols.ss7.map.api,org.mobicents.protocols.ss7.map.ap
+ i.service.lsm,org.mobicents.protocols.ss7.map.api.service.mobility.su
+ bscriberInformation,org.mobicents.protocols.ss7.map.service.lsm,org.s
+ lf4j;version="[1.5,2)"
+Class-Path: lib/slf4j-api-1.5.8.jar lib/slf4j-log4j12-1.5.8.jar lib/lo
+ g4j-1.2.14.jar lib/jbosscache-core-3.2.5.GA.jar lib/jgroups-2.6.10.GA
+ .jar lib/jboss-transaction-api-1.0.1.GA.jar lib/commons-logging-1.1.0
+ .jboss.jar lib/jboss-common-core-2.2.14.GA.jar lib/jboss-logging-spi-
+ 2.1.0.GA.jar lib/commons-pool-1.5.5.jar lib/jdiameter-api-1.7.1-157.j
+ ar lib/jdiameter-impl-1.7.1-157.jar lib/picocontainer-2.13.5.jar lib/
+ sctp-impl-1.8.15.jar lib/javolution-5.5.1.jar lib/testng-6.2.jar lib/
+ junit-4.1.jar lib/bsh-1.3.0.jar lib/jcommander-1.12.jar lib/snakeyaml
+ -1.6.jar lib/sctp-api-1.8.15.jar lib/commons-1.0.0.CR1.jar lib/netty-
+ all-4.0.36.Final.jar lib/restcomm-diameter-mux-jar-1.7.1-157.jar lib/
+ jboss-as-system-jmx-5.1.0.GA.jar lib/xml-apis-2.9.1.jar lib/jboss-vfs
+ -2.1.2.GA.jar lib/jbossxb-2.0.1.GA.jar lib/jboss-reflect-2.0.2.GA.jar
+  lib/dtdparser121-1.2.1.jar lib/activation-1.1.jar lib/jaxb-api-2.1.9
+ -brew.jar lib/jboss-deployers-core-spi-2.0.7.GA.jar lib/jboss-deploye
+ rs-impl-2.0.7.GA.jar lib/jboss-deployers-spi-2.0.7.GA.jar lib/jboss-c
+ lassloading-2.0.6.GA.jar lib/jboss-classloader-2.0.6.GA.jar lib/jboss
+ -mdr-2.0.1.GA.jar lib/javassist-3.9.0.GA.jar lib/jboss-deployers-stru
+ cture-spi-2.0.7.GA.jar lib/jboss-deployers-client-spi-2.0.7.GA.jar li
+ b/jboss-classloading-spi-5.1.0.GA.jar lib/jboss-deployers-vfs-2.0.7.G
+ A.jar lib/jboss-classloading-vfs-2.0.6.GA.jar lib/jboss-deployers-cor
+ e-2.0.7.GA.jar lib/jboss-deployers-client-2.0.7.GA.jar lib/jboss-depl
+ oyers-vfs-spi-2.0.7.GA.jar lib/stax-api-1.0.jar lib/jboss-as-j2se-5.1
+ .0.GA.jar lib/concurrent-1.3.4-jboss-update1.jar lib/jboss-bootstrap-
+ 1.0.0-Beta-3.jar lib/jboss-managed-2.1.0.SP1.jar lib/jboss-as-system-
+ 5.1.0.GA.jar lib/jboss-aop-2.1.1.GA.jar lib/ant-1.7.1.jar lib/ant-lau
+ ncher-1.7.1.jar lib/qdox-1.6.1.jar lib/trove-1.0.2.jar lib/jboss-logg
+ ing-log4j-2.1.0.GA.jar lib/jboss-profileservice-spi-5.1.0.GA.jar lib/
+ jboss-metatype-2.1.0.SP1.jar lib/jboss-aop-mc-int-2.0.6.GA.jar lib/jb
+ oss-as-jmx-5.1.0.GA.jar lib/jboss-as-j2se-5.1.0.GA-tests.jar lib/jbos
+ s-as-mbeans-5.1.0.GA.jar lib/dom4j-1.6.1.jar lib/bcel-5.1.jar lib/reg
+ exp-1.2.jar lib/jboss-test-1.1.4.GA.jar lib/ant-junit-1.7.0.jar lib/j
+ boss-profiler-jvmti-1.0.0.CR5.jar lib/jboss-server-manager-1.0.2.GA.j
+ ar lib/jnp-client-5.0.3.GA.jar lib/jbosssx-client-2.0.3.SP1.jar lib/j
+ boss-security-spi-2.0.3.SP1.jar lib/jboss-dependency-2.0.6.GA.jar lib
+ /jboss-kernel-2.0.6.GA.jar lib/jdiameter-ha-api-1.7.1-157.jar lib/tim
+ ers-1.15.30.jar lib/jdiameter-ha-impl-1.7.1-157.jar lib/jboss-ha-serv
+ er-cache-jbc-2.0.0.GA.jar lib/jboss-ha-server-api-1.1.1.GA.jar lib/jb
+ oss-ha-server-cache-spi-2.0.0.GA.jar lib/jboss-metadata-1.0.1.GA.jar 
+ lib/core-1.15.30.jar lib/cache-1.15.30.jar lib/gson-2.8.0.jar lib/map
+ -api-7.4.0-102.jar lib/tcap-api-7.4.0-102.jar lib/statistics-api-7.4.
+ 0-102.jar lib/sccp-api-7.4.0-102.jar lib/mtp-api-7.4.0-102.jar lib/as
+ n-2.2.0-21.jar lib/congestion-7.4.0-102.jar lib/isup-api-7.4.0-102.ja
+ r lib/map-impl-7.4.0-102.jar lib/tcap-impl-7.4.0-102.jar lib/statisti
+ cs-impl-7.4.0-102.jar lib/shell-server-api-7.4.0-102.jar lib/mtp-7.4.
+ 0-102.jar lib/commons-email-1.3.2.jar lib/mail-1.4.jar lib/stream-1.0
+ .0.CR1.jar lib/scheduler-7.4.0-102.jar lib/isup-impl-7.4.0-102.jar
+Tool: Bnd-1.15.0
+Main-Class: org.mobicents.servers.diameter.location.LocationServerSimu
+ lator
+Export-Package: org.mobicents.servers.diameter.location.points;uses:="
+ org.mobicents.protocols.ss7.map.api.service.mobility.subscriberInform
+ ation,org.mobicents.servers.diameter.location.data.elements,org.mobic
+ ents.servers.diameter.location.data,org.slf4j,org.mobicents.protocols
+ .ss7.map.service.lsm,org.mobicents.protocols.ss7.map.api.service.lsm,
+ org.jdiameter.api.app,org.jdiameter.common.impl.app.slg,org.jdiameter
+ .api.slg.events,org.jdiameter.server.impl.app.slg,org.jdiameter.api.s
+ lg,org.jdiameter.api,org.jdiameter.client.api,org.mobicents.protocols
+ .ss7.map.api,org.jdiameter.api.slh.events,org.jdiameter.server.impl.a
+ pp.slh,org.jdiameter.common.impl.app.slh,org.jdiameter.api.slh,org.jd
+ iameter.common.impl.app.sh,org.jdiameter.api.sh,org.jdiameter.server.
+ impl.app.sh,org.jdiameter.api.sh.events",org.mobicents.servers.diamet
+ er.location.data.elements,org.mobicents.servers.diameter.location.dat
+ a;uses:="org.mobicents.servers.diameter.location.data.elements,org.mo
+ bicents.servers.diameter.location,org.slf4j,com.google.gson",org.mobi
+ cents.servers.diameter.location;uses:="org.mobicents.servers.diameter
+ .location.data,org.slf4j,org.mobicents.servers.diameter.utils,org.mob
+ icents.servers.diameter.location.points,org.jdiameter.api.sh,org.jdia
+ meter.api.slg,org.jdiameter.common.api.app,org.jdiameter.api,org.jdia
+ meter.client.api,org.jdiameter.api.slh,org.mobicents.diameter.diction
+ ary",org.mobicents.servers.diameter.utils;uses:="org.jdiameter.common
+ .impl.validation,org.jdiameter.api.validation,org.apache.log4j,org.jd
+ iameter.api,org.jdiameter.server.impl,org.jdiameter.client.impl.helpe
+ rs,org.jdiameter.server.impl.helpers"
+Bundle-Version: 1.0.0
+Bundle-Name: Restcomm :: Examples :: location-server-simulator
+Created-By: Apache Maven Bundle Plugin
+Implementation-URL: http://www.restcomm.org
+Build-Jdk: 1.8.0_151
+
