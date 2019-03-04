@@ -36,9 +36,19 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
 
     private static final Logger logger = LoggerFactory.getLogger(ShReferencePoint.class);
 
-    private static final int DIAMETER_ERROR_USER_UNKNOWN = 5001;
-    private static final int DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK = 5490;
-    private static final int DIAMETER_ERROR_ABSENT_USER = 4201;
+    private static final int DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED = 5100;
+    private static final int DIAMETER_ERROR_OPERATION_NOT_ALLOWED = 5101;
+    private static final int DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ = 5102;
+    private static final int DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED = 5103;
+    private static final int DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES = 5104;
+    private static final int DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC = 5105;
+    private static final int DIAMETER_ERROR_SUBS_DATA_ABSENT = 5106;
+    private static final int DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA = 5107;
+    private static final int DIAMETER_ERROR_DSAI_NOT_AVAILABLE = 5108;
+    private static final int DIAMETER_ERROR_IDENTITIES_DONT_MATCH = 5002;
+    private static final int DIAMETER_ERROR_TOO_MUCH_DATA = 5008;
+    private static final int DIAMETER_USER_DATA_NOT_AVAILABLE = 4101;
+    private static final int DIAMETER_PRIOR_UPDATE_IN_PROGRESS = 4101;
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
 
@@ -114,10 +124,10 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             if (userData != null)
                 resultCode = ResultCode.SUCCESS;
             else
-                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
+                resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
         } catch (Exception e) {
             if (e.getMessage().equals("SubscriberNotFound"))
-                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
+                resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
         }
 
         UserDataAnswer uda = new UserDataAnswerImpl((Request) udr.getMessage(), resultCode);
@@ -127,16 +137,46 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             try {
                 udaAvpSet.addAvp(Avp.USER_DATA_SH, userData, 10415, true, false, true);
             } catch (Exception e) {
-                logger.info(">< Error generating User-Data-Answer", e);
+                logger.info(">< Error generating UDA] User-Data-Answer", e);
             }
-
-            if (logger.isInfoEnabled()) {
-                logger.info("<> Sending [UDA] User-Data-Answer to GMLC");
-            }
-
-            session.sendUserDataAnswer(uda);
         }
 
+        if (logger.isInfoEnabled()) {
+            if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED");
+            else if (resultCode == DIAMETER_ERROR_OPERATION_NOT_ALLOWED)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_OPERATION_NOT_ALLOWED");
+            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ");
+            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED");
+            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES");
+            else if (resultCode == DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC");
+            else if (resultCode == DIAMETER_ERROR_SUBS_DATA_ABSENT)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_SUBS_DATA_ABSENT");
+            else if (resultCode == DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA");
+            else if (resultCode == DIAMETER_ERROR_DSAI_NOT_AVAILABLE)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_DSAI_NOT_AVAILABLE");
+            else if (resultCode == DIAMETER_ERROR_IDENTITIES_DONT_MATCH)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_IDENTITIES_DONT_MATCH");
+            else if (resultCode == DIAMETER_ERROR_TOO_MUCH_DATA)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_TOO_MUCH_DATA");
+            else if (resultCode == DIAMETER_USER_DATA_NOT_AVAILABLE)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_USER_DATA_NOT_AVAILABLE");
+            else if (resultCode == DIAMETER_PRIOR_UPDATE_IN_PROGRESS)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", DIAMETER_PRIOR_UPDATE_IN_PROGRESS");
+            else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", UNABLE_TO_DELIVER");
+            else if (resultCode == ResultCode.SUCCESS)
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode+", SUCCESS");
+            else
+                logger.info("<> Sending [UDA] User-Data-Answer to GMLC with result code: "+resultCode);
+        }
+
+        session.sendUserDataAnswer(uda);
     }
 
     @Override

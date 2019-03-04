@@ -103,7 +103,7 @@
             <Address>59897904322</Address>
         </SGSNNumber>
         <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
-        <AgeOfLocationInformation>5</AgeOfLocationInformation>
+        <AgeOfLocationInformation>1</AgeOfLocationInformation>
     </PSLocationInformation>
     <Extension>
         <Extension>
@@ -116,7 +116,7 @@
                         <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
                         <MMEName>mme742@be-connect.us</MMEName>
                         <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
-                        <AgeOfLocationInformation>100</AgeOfLocationInformation>
+                        <AgeOfLocationInformation>1</AgeOfLocationInformation>
                         <UserCSGInformation>
                             <CSGId>ODE5MQ==</CSGId>
                         </UserCSGInformation>

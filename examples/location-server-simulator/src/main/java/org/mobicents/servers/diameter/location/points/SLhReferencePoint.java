@@ -112,11 +112,15 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         SubscriberElement subscriberElement = null;
         try {
             subscriberElement = subscriberInformation.getElementBySubscriber(imsi, msisdn);
+            if (subscriberElement.locationResult == 5490)
+                resultCode = DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK;
+            if (subscriberElement.locationResult == 4201)
+                resultCode = DIAMETER_ERROR_ABSENT_USER;
         } catch (Exception e) {
             if (e.getMessage().equals("SubscriberCoherentData"))
                 resultCode = ResultCode.CONTRADICTING_AVPS;
             else if (e.getMessage().equals("SubscriberNotFound"))
-                resultCode = DIAMETER_ERROR_ABSENT_USER;
+                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
         }
 
         LCSRoutingInfoAnswer ria = new LCSRoutingInfoAnswerImpl((Request) rir.getMessage(), resultCode);
@@ -175,7 +179,18 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC");
+            if (resultCode == DIAMETER_ERROR_USER_UNKNOWN)
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_UNKNOWN");
+            else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK");
+            else if (resultCode == DIAMETER_ERROR_ABSENT_USER)
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_ABSENT_USER");
+            else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", UNABLE_TO_DELIVER");
+            else if (resultCode == ResultCode.SUCCESS)
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", SUCCESS");
+            else
+                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode);
         }
 
         session.sendLCSRoutingInfoAnswer(ria);

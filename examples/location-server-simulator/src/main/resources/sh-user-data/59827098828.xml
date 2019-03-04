@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <PSLocationInformation>
+        <CellGlobalId>NzIBAAFOSg==</CellGlobalId>
+        <RoutingAreaId>R/gQOTUy</RoutingAreaId>
+        <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+        <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
+        <SGSNNumber>
+            <Address>59897904322</Address>
+        </SGSNNumber>
+        <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
+        <AgeOfLocationInformation>0</AgeOfLocationInformation>
+    </PSLocationInformation>
+</Sh-Data>

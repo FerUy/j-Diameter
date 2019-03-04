@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <CSLocationInformation>
+        <LocationNumber>hJdlMCRFmQk=</LocationNumber>
+        <CellGlobalId>NzIBAAFOSg==</CellGlobalId>
+        <GeographicalInformation>EBu2ELlt9wA=</GeographicalInformation>
+        <GeodeticInformation>AxCiJcdOOq8ZAQ==</GeodeticInformation>
+        <VLRNumber>
+            <Address>59897901234</Address>
+        </VLRNumber>
+        <MSCNumber>
+            <Address>59897901234</Address>
+        </MSCNumber>
+        <CurrentLocationRetrieved>true</CurrentLocationRetrieved>
+        <AgeOfLocationInformation>0</AgeOfLocationInformation>
+    </CSLocationInformation>
+    <Extension>
+        <Extension>
+            <Extension>
+                <Extension>
+                    <EPSLocationInformation>
+                        <E-UTRANCellGlobalId>NzIBAAFOSg==</E-UTRANCellGlobalId>
+                        <TrackingAreaId>NzIBOTU=</TrackingAreaId>
+                        <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+                        <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
+                        <MMEName>mme742@be-connect.us</MMEName>
+                        <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
+                        <AgeOfLocationInformation>100</AgeOfLocationInformation>
+                        <UserCSGInformation>
+                            <CSGId>ODE5MQ==</CSGId>
+                        </UserCSGInformation>
+                    </EPSLocationInformation>
+                </Extension>
+            </Extension>
+        </Extension>
+    </Extension>
+</Sh-Data>

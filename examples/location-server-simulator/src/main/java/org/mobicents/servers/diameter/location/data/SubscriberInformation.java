@@ -97,9 +97,10 @@ public class SubscriberInformation {
 
             return subscriberUserDataBuffer.toString();
         } catch (Exception e) {
-            logger.warn("Subscriber location information load error!", e);
+            logger.warn("Subscriber information load error, not found!");
+            throw new Exception("SubscriberNotFound");
         }
-        throw new Exception("SubscriberNotFound");
+        //throw new Exception("SubscriberNotFound");
     }
 
 }

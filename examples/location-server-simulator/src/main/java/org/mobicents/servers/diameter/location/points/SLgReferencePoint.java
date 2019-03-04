@@ -45,7 +45,6 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
     private static final int DIAMETER_ERROR_USER_UNKNOWN = 5001;
     private static final int DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK = 5490;
-
     private static final int DIAMETER_ERROR_UNREACHABLE_USER = 4221;
     private static final int DIAMETER_ERROR_SUSPENDED_USER = 4222;
     private static final int DIAMETER_ERROR_DETACHED_USER = 4223;
@@ -201,7 +200,29 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Sending [PLA] Provide-Location-Answer to GMLC");
+            if (resultCode == DIAMETER_ERROR_USER_UNKNOWN)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_USER_UNKNOWN");
+            else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK");
+            else if (resultCode == DIAMETER_ERROR_UNREACHABLE_USER)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNREACHABLE_USER");
+            else if (resultCode == DIAMETER_ERROR_SUSPENDED_USER)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_SUSPENDED_USER");
+            else if (resultCode == DIAMETER_ERROR_DETACHED_USER)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_DETACHED_USER");
+            else if (resultCode == DIAMETER_ERROR_POSITIONING_DENIED)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_POSITIONING_DENIED");
+            else if (resultCode == DIAMETER_ERROR_POSITIONING_FAILED)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_POSITIONING_FAILED");
+            else if (resultCode == DIAMETER_ERROR_UNKNOWN_UNREACHABLE)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNKNOWN_UNREACHABLE");
+            else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", UNABLE_TO_DELIVER");
+            else if (resultCode == ResultCode.SUCCESS)
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", SUCCESS");
+            else
+                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode);
+
         }
 
         session.sendProvideLocationAnswer(pla);

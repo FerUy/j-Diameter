@@ -72,7 +72,6 @@ import org.jdiameter.common.impl.app.sh.PushNotificationRequestImpl;
 import org.jdiameter.common.impl.app.sh.ShSession;
 import org.jdiameter.common.impl.app.sh.SubscribeNotificationsAnswerImpl;
 import org.jdiameter.common.impl.app.sh.UserDataAnswerImpl;
-import org.jdiameter.common.impl.app.sh.UserDataRequestImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,8 +148,7 @@ public class ShClientSessionImpl extends ShSession implements ClientShSession, E
 
         case RECEIVE_USER_DATA_ANSWER:
           //listener.doUserDataAnswerEvent(this, (UserDataRequest) localEvent.getRequest(), new UserDataAnswerImpl((Answer) localEvent.getAnswer().getMessage()));
-          listener.doUserDataAnswerEvent(this, new UserDataRequestImpl((Request) localEvent.getRequest().getMessage()),
-              new UserDataAnswerImpl((Answer) localEvent.getAnswer().getMessage()));
+          listener.doUserDataAnswerEvent(this, null, new UserDataAnswerImpl((Answer) localEvent.getAnswer().getMessage()));
           break;
 
         case RECEIVE_SUBSCRIBE_NOTIFICATIONS_ANSWER:
