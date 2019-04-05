@@ -3,15 +3,18 @@ package org.mobicents.servers.diameter.location;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.jdiameter.api.ApplicationId;
 import org.jdiameter.api.IllegalDiameterStateException;
 import org.jdiameter.api.InternalException;
@@ -19,20 +22,14 @@ import org.jdiameter.api.Mode;
 import org.jdiameter.api.Network;
 import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Peer;
-import org.jdiameter.api.PeerTable;
 import org.jdiameter.api.RouteException;
 import org.jdiameter.api.SessionFactory;
-import org.jdiameter.api.sh.ClientShSession;
 import org.jdiameter.api.sh.ServerShSession;
-import org.jdiameter.api.slg.ClientSLgSession;
 import org.jdiameter.api.slg.ServerSLgSession;
-import org.jdiameter.api.slh.ClientSLhSession;
 import org.jdiameter.api.slh.ServerSLhSession;
 import org.jdiameter.client.api.ISessionFactory;
-import org.jdiameter.common.impl.app.sh.ShSession;
-import org.jdiameter.common.impl.app.sh.ShSessionFactoryImpl;
+import org.jgroups.util.Command;
 import org.mobicents.diameter.dictionary.AvpDictionary;
-import org.mobicents.servers.diameter.location.data.SubscriberElement;
 import org.mobicents.servers.diameter.location.data.SubscriberInformation;
 import org.mobicents.servers.diameter.location.points.SLgReferencePoint;
 import org.mobicents.servers.diameter.location.points.SLhReferencePoint;
@@ -41,7 +38,11 @@ import org.mobicents.servers.diameter.utils.StackCreator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Request;
+import spark.Response;
+import spark.RouteImpl;
 
+import static spark.Spark.*;
 
 /**
  * BeConnect Diameter Location Server Simulator.
@@ -67,17 +68,76 @@ public class LocationServerSimulator {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        boolean doomsday = true;
+        // Parse command line options
+        Options options = new Options();
+        options.addOption(new Option("r", "rest", false, "run simulator as a RESTful service"));
+        options.addOption(new Option("p", "port", true, "run simulator on defined port"));
 
+        CommandLineParser commandLineParser = new DefaultParser();
+        CommandLine commandLine;
+        try {
+            commandLine = commandLineParser.parse(options, args);
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        // start location server
         LocationServerSimulator locationServerSimulator = new LocationServerSimulator();
 
+        // define RESTful API reoutes if background mode selected
+        if (commandLine.hasOption("rest")) {
+            if (commandLine.getOptionValue("port") != null)
+                try {
+                    port(Integer.parseInt(commandLine.getOptionValue("port")));
+                } catch (Exception e) {
+                    System.out.println("invalid port value passed on -port");
+                }
+
+            /*
+                RESTful API route for LocationReportRequest
+
+                PROTO:      HTTP-GET
+                URL:        http://localhost:4567/lrr?msisdn={MSISDN}&locationEvent={LOCATION_EVENT_TYPE}&lcsReferenceNumber={REFERENCE_NUMBER}
+                ARGUMENTS {
+                    MSISDN[IntegerAsString],
+                    LOCATION_EVENT_TYPE[Integer] {
+                        EMERGENCY_CALL_ORIGINATION(0)
+                        EMERGENCY_CALL_RELEASE(1)
+                        MO_LR(2)
+                        EMERGENCY_CALL_HANDOVER(3)
+                        DEFERRED_MT_LR_RESPONSE(4)
+                        DEFERRED_MO_LR_TTTP_INITIATION(5)
+                        DELAYED_LOCATION_REPORTING(6)
+                    },
+                    REFERENCE_NUMBER[IntegerAsString]
+                }
+                Examples:
+                curl -X GET 127.0.0.1:4567/lrr?msisdn=59899077937\&locationEvent=4\&lcsReferenceNumber=31
+                Web browser
+                http://localhost:4567/lrr?msisdn=573195897484&locationEvent=2&lcsReferenceNumber=281
+
+             */
+            get("/lrr", new RouteImpl("/lrr") {
+                @Override
+                public Object handle(Request request, Response response) throws Exception {
+                    String msisdn = request.queryParams("msisdn");
+                    String locationEvent = request.queryParams("locationEvent");
+                    String lcsReferenceNumber = request.queryParams("lcsReferenceNumber");
+                    return locationServerSimulator.sendLocationReportRequest(msisdn, locationEvent, lcsReferenceNumber);
+                }
+            });
+
+            return;
+        }
+
+        // default interactive console mode
         Scanner scanner = new Scanner(System.in);
-        while (doomsday) {
+        while (true) {
             try {
                 String command = scanner.nextLine();
                 if (command.equals("exit")) {
-                    locationServerSimulator.delete();
-                    doomsday = false;
+                    break;
                 } else if (command.startsWith("lrr ")) {
                     locationServerSimulator.sendLocationReportRequest(command);
                 } else if (command.equals("?") || command.equals("help")) {
@@ -87,10 +147,8 @@ public class LocationServerSimulator {
                 e.printStackTrace();
             }
         }
-    }
 
-    public void delete() {
-        this.stackCreator.destroy();
+        System.exit(0);
     }
 
     StackCreator stackCreator = null;
@@ -141,7 +199,7 @@ public class LocationServerSimulator {
             shHomeSubscriberServer = new ShReferencePoint(sessionFactory, subscriberInformation);
             sessionFactory.registerAppFacory(ServerShSession.class, shHomeSubscriberServer);
             network.addNetworkReqListener(shHomeSubscriberServer,
-                ApplicationId.createByAuthAppId(10415L, shHomeSubscriberServer.getApplicationId()));
+                    ApplicationId.createByAuthAppId(10415L, shHomeSubscriberServer.getApplicationId()));
         } catch (Exception e) {
             logger.error("Failure initializing be-connect diameter Sh/SLh/SLg server simulator", e);
         }
@@ -159,6 +217,18 @@ public class LocationServerSimulator {
         this.slgMobilityManagementEntity.sendLocationReportRequest(msisdn, locationEventType, lcsReferenceNumber);
     }
 
+    public String sendLocationReportRequest(String msisdn, String locationEvent, String lcsReferenceNumber) {
+        String result = "\nLRR sent successfully!\n";
+        try {
+            Integer locationEventType = Integer.parseInt(locationEvent);
+            this.slgMobilityManagementEntity.sendLocationReportRequest(msisdn, locationEventType, lcsReferenceNumber);
+        } catch (Exception e) {
+            result = String.format("\nLRR caused an exception '%s' - not sent!\n", e.getMessage());
+        }
+
+        return result;
+    }
+
     private void printLogo() {
         if (logger.isInfoEnabled()) {
             Properties sysProps = System.getProperties();
@@ -172,7 +242,7 @@ public class LocationServerSimulator {
 
             logger.info("===============================================================================");
             logger.info("");
-            logger.info("==  be-connect diameter Sh/SLh/SLg server simulator (" + osLine + ")");
+            logger.info("==  Be-Connect Diameter Sh/SLh/SLg Server Simulator (" + osLine + ")");
             logger.info("");
             logger.info("==  " + javaLine);
             logger.info("");
