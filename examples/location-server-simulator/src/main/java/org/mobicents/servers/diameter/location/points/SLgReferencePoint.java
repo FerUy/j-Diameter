@@ -274,7 +274,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                     ApplicationId.createByAuthAppId(10415, 16777255), ServerSLgSession.class, null);
 
             LocationReportRequest lrr = new LocationReportRequestImpl(session.getSessions().get(0).createRequest(LocationReportRequest.code,
-                    ApplicationId.createByAuthAppId(10415, 16777255), "be-connect.us"));
+                    ApplicationId.createByAuthAppId(10415, 16777255), "restcomm.org"));
 
             AvpSet lrrAvpSet = lrr.getMessage().getAvps();
 

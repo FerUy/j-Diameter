@@ -240,15 +240,15 @@ public class LocationServerSimulator {
 
             String diameterLine = localPeer.getProductName() + " (" + localPeer.getUri() + " @ " + localPeer.getRealmName() + ")";
 
-            logger.info("===============================================================================");
-            logger.info("");
-            logger.info("==  Be-Connect Diameter Sh/SLh/SLg Server Simulator (" + osLine + ")");
-            logger.info("");
-            logger.info("==  " + javaLine);
-            logger.info("");
-            logger.info("==  " + diameterLine);
-            logger.info("");
-            logger.info("===============================================================================");
+            logger.info("||==============================================================================||");
+            logger.info("||                                                                            	||");
+            logger.info("||  Diameter SLh/SLg/Sh LTE/IMS Location Services Simulator (" + osLine + ")");
+            logger.info("||                                                        		       	||");
+            logger.info("||  " + javaLine);
+            logger.info("||                                                                            	||");
+            logger.info("||  " + diameterLine);
+            logger.info("||                                                                            	||");
+            logger.info("||==============================================================================||");
         }
     }
 

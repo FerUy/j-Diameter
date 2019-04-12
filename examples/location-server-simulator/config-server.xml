@@ -6,7 +6,7 @@
     <IPAddresses>
       <IPAddress value="127.0.0.1" />
     </IPAddresses>
-    <Realm value="be-connect.us" />
+    <Realm value="restcomm.org" />
     <VendorID value="10415" />
     <ProductName value="Location Server Simulator" />
     <FirmwareRevision value="1" />
@@ -33,21 +33,21 @@
       <Peer name="aaa://gmlc" attempt_connect="false" rating="1" />
     </Peers>
     <Realms>
-      <Realm name="be-connect.us" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
         <ApplicationID>
           <VendorId value="10415" />
           <AuthApplId value="16777255" />
           <AcctApplId value="0" />
         </ApplicationID>
       </Realm>
-      <Realm name="be-connect.us" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
         <ApplicationID>
           <VendorId value="10415" />
           <AuthApplId value="16777291" />
           <AcctApplId value="0" />
         </ApplicationID>
       </Realm>
-      <Realm name="be-connect.us" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
         <ApplicationID>
           <VendorId value="10415" />
           <AuthApplId value="16777217" />
