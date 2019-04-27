@@ -22,7 +22,7 @@ public class SubscriberElement {
     public Integer locationResult = 2001;
 
     public LocationEstimate locationEstimate;
-    public Long accuracyFulfilmentIndicator;
+    public Integer accuracyFulfilmentIndicator;
     public Long ageOfLocationEstimate;
     public VelocityEstimate velocityEstimate;
     public String eutranPositioningData;
@@ -42,36 +42,33 @@ public class SubscriberElement {
 
     public Long lrrFlags;
     public Integer deferredMtLrDataLocationType;
-    public Integer deferredMtLrDataTerminationCause;
+    public Long deferredMtLrDataTerminationCause;
     public ServingNode deferredMtLrDataServingNode;
 
     public String imei;
     public String lcsEpsClientNameString;
-    public String lcsEpsClientNameFormatInd;
-    public String pseudonymIndicator;
+    public Integer lcsEpsClientNameFormatInd;
+    public Integer pseudonymIndicator;
     public Long lcsServiceTypeId;
-    public String lcsQosClass;
-    public Integer reportingAmount;
-    public Integer reportingInterval;
+    public Integer lcsQosClass;
+    public Long reportingAmount;
+    public Long reportingInterval;
     public String oneXRttRcid;
+    public Long delayedLocationDataTerminationCause;
     public ServingNode delayedLocationDataServingNode;
 
-    public SubscriberElement(String imsi, String msisdn, String lmsi,
-                             ServingNode servingNode, ServingNode additionalServingNode,
-                             String gmlcAddress, String pprAddress, Long riaFlags,
-                             LocationEstimate locationEstimate, Long accuracyFulfilmentIndicator,
-                             Long ageOfLocationEstimate, VelocityEstimate velocityEstimate,
-                             String eutranPositioningData, String eutranCellGlobalIdentity,
-                             String geranPositioningData, String geranGanssPositioningData,
-                             String cellGlobalIdentity, String utranPositioningData,
-                             String utranGanssPositioningData, String utranAdditionalPositioningData,
-                             String serviceAreaIdentity, Long plaFlags, String esmlcCellInfoEcgi,
-                             Long esmlcCellInfoCpi, String civicAddress, Long barometricPressure,
-                             Long lrrFlags, String imei, String lcsEpsClientNameString,
-                             String lcsEpsClientNameFormatInd, String pseudonymIndicator, Long lcsServiceTypeId, String lcsQosClass,
-                             Integer reportingAmount, Integer reportingInterval, String oneXRttRcid,
-                             ServingNode delayedLocationDataServingNode) {
-
+    public SubscriberElement(String imsi, String msisdn, String lmsi, ServingNode servingNode, ServingNode additionalServingNode,
+                             String gmlcAddress, String pprAddress, Long riaFlags, Integer locationResult,
+                             LocationEstimate locationEstimate, Integer accuracyFulfilmentIndicator, Long ageOfLocationEstimate,
+                             VelocityEstimate velocityEstimate, String eutranPositioningData, String eutranCellGlobalIdentity,
+                             String geranPositioningData, String geranGanssPositioningData, String cellGlobalIdentity,
+                             String utranPositioningData, String utranGanssPositioningData, String utranAdditionalPositioningData,
+                             String serviceAreaIdentity, Long plaFlags, String esmlcCellInfoEcgi, Long esmlcCellInfoCpi,
+                             String civicAddress, Long barometricPressure, Long lrrFlags, Integer deferredMtLrDataLocationType,
+                             Long deferredMtLrDataTerminationCause, ServingNode deferredMtLrDataServingNode, String imei,
+                             String lcsEpsClientNameString, Integer lcsEpsClientNameFormatInd, Integer pseudonymIndicator,
+                             Long lcsServiceTypeId, Integer lcsQosClass, Long reportingAmount, Long reportingInterval,
+                             String oneXRttRcid, Long delayedLocationDataTerminationCause, ServingNode delayedLocationDataServingNode) {
         this.imsi = imsi;
         this.msisdn = msisdn;
         this.lmsi = lmsi;
@@ -80,7 +77,7 @@ public class SubscriberElement {
         this.gmlcAddress = gmlcAddress;
         this.pprAddress = pprAddress;
         this.riaFlags = riaFlags;
-
+        this.locationResult = locationResult;
         this.locationEstimate = locationEstimate;
         this.accuracyFulfilmentIndicator = accuracyFulfilmentIndicator;
         this.ageOfLocationEstimate = ageOfLocationEstimate;
@@ -99,18 +96,20 @@ public class SubscriberElement {
         this.esmlcCellInfoCpi = esmlcCellInfoCpi;
         this.civicAddress = civicAddress;
         this.barometricPressure = barometricPressure;
-
         this.lrrFlags = lrrFlags;
+        this.deferredMtLrDataLocationType = deferredMtLrDataLocationType;
+        this.deferredMtLrDataTerminationCause = deferredMtLrDataTerminationCause;
+        this.deferredMtLrDataServingNode = deferredMtLrDataServingNode;
         this.imei = imei;
-        this.reportingAmount = reportingAmount;
-        this.reportingInterval = reportingInterval;
         this.lcsEpsClientNameString = lcsEpsClientNameString;
         this.lcsEpsClientNameFormatInd = lcsEpsClientNameFormatInd;
         this.pseudonymIndicator = pseudonymIndicator;
         this.lcsServiceTypeId = lcsServiceTypeId;
         this.lcsQosClass = lcsQosClass;
+        this.reportingAmount = reportingAmount;
+        this.reportingInterval = reportingInterval;
         this.oneXRttRcid = oneXRttRcid;
+        this.delayedLocationDataTerminationCause = delayedLocationDataTerminationCause;
         this.delayedLocationDataServingNode = delayedLocationDataServingNode;
     }
-
 }

@@ -6,19 +6,19 @@ package org.mobicents.servers.diameter.location.data.elements;
  */
 public class LocationEstimate {
 
-    public Integer typeOfShape = 0;
+    public Integer typeOfShape;
+    public Double latitude;
+    public Double longitude;
+    public Double uncertainty;
+    public Integer confidence;
+    public Double uncertaintySemiMajorAxis;
+    public Double uncertaintySemiMinorAxis;
+    public Double angleOfMajorAxis;
+    public Integer altitude;
+    public Double uncertaintyAltitude;
+    public Integer innerRadius;
+    public Double uncertaintyInnerRadius;
+    public Double offsetAngle;
+    public Double includedAngle;
 
-    public Double latitude = 0.00;
-    public Double longitude = 0.00;
-    public Double uncertainty = 0.00;
-    public Integer confidence = 0;
-    public Double uncertaintySemiMajorAxis = 0.00;
-    public Double uncertaintySemiMinorAxis = 0.00;
-    public Double angleOfMajorAxis = 0.00;
-    public Integer altitude = 0;
-    public Double uncertaintyAltitude = 0.00;
-    public Integer innerRadius = 0;
-    public Integer uncertaintyInnerRadius = 0;
-    public Double offsetAngle = 0.00;
-    public Double includedAngle = 0.00;
 }

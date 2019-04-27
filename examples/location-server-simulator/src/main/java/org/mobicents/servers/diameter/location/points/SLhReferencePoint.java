@@ -88,7 +88,8 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         String imsi = "";
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Processing [RIR] Routing-Info-Request for request [" + rir + "] session-id [" + session.getSessionId() +"]");
+            logger.info("<> Processing [RIR] Routing-Info-Request for request [" + rir + "] from " +rir.getOriginHost() + "@" +rir.getOriginRealm() +
+                " with session-id [" + session.getSessionId() +"]");
         }
 
         AvpSet rirAvpSet = rir.getMessage().getAvps();
@@ -180,17 +181,22 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
 
         if (logger.isInfoEnabled()) {
             if (resultCode == DIAMETER_ERROR_USER_UNKNOWN)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_USER_UNKNOWN");
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_USER_UNKNOWN)");
             else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK");
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
             else if (resultCode == DIAMETER_ERROR_ABSENT_USER)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", DIAMETER_ERROR_ABSENT_USER");
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_ABSENT_USER)");
             else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", UNABLE_TO_DELIVER");
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                    " (UNABLE_TO_DELIVER)");
             else if (resultCode == ResultCode.SUCCESS)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode+", SUCCESS");
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                    " (SUCCESS)");
             else
-                logger.info("<> Sending [RIA] Routing-Info-Answer to GMLC with result code: "+resultCode);
+                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:"+ resultCode);
         }
 
         session.sendLCSRoutingInfoAnswer(ria);

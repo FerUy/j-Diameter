@@ -94,18 +94,23 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
     @Override
     public void doProvideLocationRequestEvent(ServerSLgSession session, ProvideLocationRequest plr)
-            throws InternalException, IllegalDiameterStateException, RouteException, OverloadException, AvpDataException {
+        throws InternalException, IllegalDiameterStateException, RouteException, OverloadException, AvpDataException {
 
         int resultCode = ResultCode.SUCCESS;
 
         String msisdn = "";
         String imsi = "";
+        Integer lcsReferenceNumber = null;
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Processing [PLR] Provide-Location-Request for request [" + plr + "] session-id [" + session.getSessionId() +"]");
+            logger.info("<> Processing [PLR] Provide-Location-Request for request [" + plr + "] from "+ plr.getOriginHost() + "@" +plr.getOriginRealm() +
+                " with session-id [" + session.getSessionId() +"]");
         }
 
         AvpSet plrAvpSet = plr.getMessage().getAvps();
+
+        if (plr.getMessage().getAvps().getAvp(Avp.LCS_REFERENCE_NUMBER) != null)
+            lcsReferenceNumber = plr.getMessage().getAvps().getAvp(Avp.LCS_REFERENCE_NUMBER).getInteger32();
 
         plrAvpSet.getAvp(Avp.SLG_LOCATION_TYPE).getInteger32();
         if (plrAvpSet.getAvp(Avp.USER_NAME) != null) {
@@ -168,8 +173,12 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                             subscriberElement.velocityEstimate.uncertaintyVerticalSpeed).getData(), 10415, true, false);
                 }
 
-                if (subscriberElement.eutranPositioningData != null)
-                    plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
+                if (subscriberElement.eutranPositioningData != null) {
+                    byte[] etranPositioningDataBytes = {35, 92, 106, 25, 17};
+                    String etranPositioningDataString = new String(etranPositioningDataBytes);
+                    plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, etranPositioningDataString, 10415, true, false, true);
+                    //plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
+                }
 
                 if (subscriberElement.eutranCellGlobalIdentity != null)
                     plaAvpSet.addAvp(Avp.ECGI, subscriberElement.eutranCellGlobalIdentity, 10415, true, false, true);
@@ -228,28 +237,84 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         }
 
         if (logger.isInfoEnabled()) {
-            if (resultCode == DIAMETER_ERROR_USER_UNKNOWN)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_USER_UNKNOWN");
-            else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK");
-            else if (resultCode == DIAMETER_ERROR_UNREACHABLE_USER)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNREACHABLE_USER");
-            else if (resultCode == DIAMETER_ERROR_SUSPENDED_USER)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_SUSPENDED_USER");
-            else if (resultCode == DIAMETER_ERROR_DETACHED_USER)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_DETACHED_USER");
-            else if (resultCode == DIAMETER_ERROR_POSITIONING_DENIED)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_POSITIONING_DENIED");
-            else if (resultCode == DIAMETER_ERROR_POSITIONING_FAILED)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_POSITIONING_FAILED");
-            else if (resultCode == DIAMETER_ERROR_UNKNOWN_UNREACHABLE)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", DIAMETER_ERROR_UNKNOWN_UNREACHABLE");
-            else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", UNABLE_TO_DELIVER");
-            else if (resultCode == ResultCode.SUCCESS)
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode+", SUCCESS");
-            else
-                logger.info("<> Sending [PLA] Provide-Location-Answer with result code: "+resultCode);
+            if (resultCode == DIAMETER_ERROR_USER_UNKNOWN) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_USER_UNKNOWN)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_USER_UNKNOWN)");
+            } else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
+            } else if (resultCode == DIAMETER_ERROR_UNREACHABLE_USER) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_UNREACHABLE_USER)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_UNREACHABLE_USER)");
+            } else if (resultCode == DIAMETER_ERROR_SUSPENDED_USER) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_SUSPENDED_USER)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_SUSPENDED_USER)");
+            } else if (resultCode == DIAMETER_ERROR_DETACHED_USER) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_DETACHED_USER)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_DETACHED_USER)");
+            } else if (resultCode == DIAMETER_ERROR_POSITIONING_DENIED) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_POSITIONING_DENIED)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_POSITIONING_DENIED)");
+            } else if (resultCode == DIAMETER_ERROR_POSITIONING_FAILED) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_POSITIONING_FAILED)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_POSITIONING_FAILED");
+            } else if (resultCode == DIAMETER_ERROR_UNKNOWN_UNREACHABLE) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_UNKNOWN_UNREACHABLE)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (DIAMETER_ERROR_UNKNOWN_UNREACHABLE)");
+            } else if (resultCode == ResultCode.UNABLE_TO_DELIVER) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (UNABLE_TO_DELIVER)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (UNABLE_TO_DELIVER)");
+            } else if (resultCode == ResultCode.SUCCESS) {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (SUCCESS)");
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode + " (SUCCESS)");
+            } else {
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
+                        " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode);
+                else
+                    logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
+                        + resultCode);
+            }
         }
 
         session.sendProvideLocationAnswer(pla);
@@ -293,7 +358,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
             if (subscriberElement.lcsEpsClientNameString != null && subscriberElement.lcsEpsClientNameFormatInd != null) {
                 AvpSet lcsEpsClientName = lrrAvpSet.addGroupedAvp(Avp.LCS_EPS_CLIENT_NAME, 10415, true, false);
                 lcsEpsClientName.addAvp(Avp.LCS_NAME_STRING, subscriberElement.lcsEpsClientNameString, 10415, true, false, false);
-                lcsEpsClientName.addAvp(Avp.LCS_FORMAT_INDICATOR, subscriberElement.lcsEpsClientNameFormatInd, 10415, true, false, false);
+                lcsEpsClientName.addAvp(Avp.LCS_FORMAT_INDICATOR, subscriberElement.lcsEpsClientNameFormatInd, 10415, true, false, true);
             }
 
             if (subscriberElement.locationEstimate != null) {
@@ -315,7 +380,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
             }
 
             if (subscriberElement.accuracyFulfilmentIndicator != null)
-                lrrAvpSet.addAvp(Avp.ACCURACY_FULFILMENT_INDICATOR, subscriberElement.accuracyFulfilmentIndicator, 10415, false, false);
+                lrrAvpSet.addAvp(Avp.ACCURACY_FULFILMENT_INDICATOR, subscriberElement.accuracyFulfilmentIndicator, 10415, false, false, true);
 
             if (subscriberElement.ageOfLocationEstimate != null)
                 lrrAvpSet.addAvp(Avp.AGE_OF_LOCATION_ESTIMATE, subscriberElement.ageOfLocationEstimate, 10415, false, false, true);
@@ -330,8 +395,12 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                         subscriberElement.velocityEstimate.uncertaintyVerticalSpeed).getData(), 10415, false, false);
             }
 
-            if (subscriberElement.eutranPositioningData != null)
-                lrrAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, false, false, true);
+            if (subscriberElement.eutranPositioningData != null) {
+                byte[] etranPositioningDataBytes = {35, 92, 16, 25, 43};
+                String etranPositioningDataString = new String(etranPositioningDataBytes);
+                lrrAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, etranPositioningDataString, 10415, true, false, true);
+                //lrrAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
+            }
 
             if (subscriberElement.eutranCellGlobalIdentity != null)
                 lrrAvpSet.addAvp(Avp.ECGI, subscriberElement.eutranCellGlobalIdentity,10415, false, false, true);
@@ -360,9 +429,9 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 lrrAvpSet.addAvp(Avp.LCS_SERVICE_TYPE_ID, subscriberElement.lcsServiceTypeId, 10415, true, false, true);
 
             if (subscriberElement.pseudonymIndicator != null)
-                lrrAvpSet.addAvp(Avp.PSEUDONYM_INDICATOR, subscriberElement.pseudonymIndicator, 10415, false, false,false);
+                lrrAvpSet.addAvp(Avp.PSEUDONYM_INDICATOR, subscriberElement.pseudonymIndicator, 10415, false, false,true);
 
-            lrrAvpSet.addAvp(Avp.LCS_QOS_CLASS, subscriberElement.lcsQosClass, 10415, false, false, false);
+            lrrAvpSet.addAvp(Avp.LCS_QOS_CLASS, subscriberElement.lcsQosClass, 10415, false, false, true);
 
             if (subscriberElement.servingNode != null) {
                 AvpSet servingNode = lrrAvpSet.addGroupedAvp(Avp.SERVING_NODE, 10415, false, false);
@@ -387,7 +456,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 AvpSet deferredMtLrData = lrrAvpSet.addGroupedAvp(Avp.DEFERRED_MT_LR_DATA, 10415, false, false);
                 if (subscriberElement.deferredMtLrDataLocationType != null && subscriberElement.deferredMtLrDataTerminationCause != null) {
                     deferredMtLrData.addAvp(Avp.DEFERRED_LOCATION_TYPE, subscriberElement.deferredMtLrDataLocationType,10415, false, false, true);
-                    deferredMtLrData.addAvp(Avp.TERMINATION_CAUSE, subscriberElement.deferredMtLrDataTerminationCause,false, false, true);
+                    deferredMtLrData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.deferredMtLrDataTerminationCause, 10415,false, false, true);
                 }
                 AvpSet deferredMtLrDataServingNode = deferredMtLrData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
                 deferredMtLrDataServingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.deferredMtLrDataServingNode.sgsnNumber, 10415, false, false, true);
@@ -421,7 +490,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
             if (subscriberElement.delayedLocationDataServingNode != null) {
                 AvpSet delayedLocationReportedData = lrrAvpSet.addGroupedAvp(DIAMETER_AVP_DELAYED_LOCATION_REPORTING_DATA, 10415, false, false);
-                delayedLocationReportedData.addAvp(Avp.TERMINATION_CAUSE, 8, true, false, true);
+                delayedLocationReportedData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.delayedLocationDataTerminationCause, 10415, false, false, true);
                 AvpSet delayedLocationReportedDataservingNode = delayedLocationReportedData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
                 delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.delayedLocationDataServingNode.sgsnNumber, 10415, false, false, true);
                 delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NAME, subscriberElement.delayedLocationDataServingNode.sgsnName, 10415, false, false, false);
@@ -441,7 +510,10 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 lrrAvpSet.addAvp(Avp.BAROMETRIC_PRESSURE, subscriberElement.barometricPressure, 10415, false, false, true);
 
             if (logger.isInfoEnabled()) {
-                logger.info("<> Sending [LRR] Location-Report-Request to GMLC, session-id [" + session.getSessionId() +"]");
+                if (lcsReferenceNumber != null)
+                    logger.info("<> Sending [LRR] Location-Report-Request to GMLC for session-id [" + session.getSessionId() +"] and LCS-Reference-Number:" + lcsReferenceNumber);
+                else
+                    logger.info("<> Sending [LRR] Location-Report-Request to GMLC for session-id [" + session.getSessionId() +"]");
             }
 
             session.sendLocationReportRequest(lrr);
@@ -482,7 +554,8 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
             }
 
             if (logger.isInfoEnabled()) {
-                logger.info("<> Got [LRA] Location-Report-Answer for request [" + lrr + "]");
+                logger.info("<> Got [LRA] Location-Report-Answer from " + lra.getOriginHost() + "@" + lra.getOriginRealm() + " for request [" + lrr + "] " +
+                    "and session-id [" + session.getSessionId() + "]");
             }
 
         } catch (Exception e) {
