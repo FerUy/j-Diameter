@@ -28,7 +28,6 @@ import org.jdiameter.api.sh.ServerShSession;
 import org.jdiameter.api.slg.ServerSLgSession;
 import org.jdiameter.api.slh.ServerSLhSession;
 import org.jdiameter.client.api.ISessionFactory;
-import org.jgroups.util.Command;
 import org.mobicents.diameter.dictionary.AvpDictionary;
 import org.mobicents.servers.diameter.location.data.SubscriberInformation;
 import org.mobicents.servers.diameter.location.points.SLgReferencePoint;
@@ -85,7 +84,7 @@ public class LocationServerSimulator {
         // start location server
         LocationServerSimulator locationServerSimulator = new LocationServerSimulator();
 
-        // define RESTful API reoutes if background mode selected
+        // define RESTful API routes if background mode selected
         if (commandLine.hasOption("rest")) {
             if (commandLine.getOptionValue("port") != null)
                 try {
