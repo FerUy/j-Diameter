@@ -47,7 +47,7 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
     private static final int DIAMETER_ERROR_DSAI_NOT_AVAILABLE = 5108;
     private static final int DIAMETER_ERROR_IDENTITIES_DONT_MATCH = 5002;
     private static final int DIAMETER_ERROR_TOO_MUCH_DATA = 5008;
-    private static final int DIAMETER_USER_DATA_NOT_AVAILABLE = 4101;
+    private static final int DIAMETER_USER_DATA_NOT_AVAILABLE = 4100;
     private static final int DIAMETER_PRIOR_UPDATE_IN_PROGRESS = 4101;
 
     private static final Object[] EMPTY_ARRAY = new Object[]{};
