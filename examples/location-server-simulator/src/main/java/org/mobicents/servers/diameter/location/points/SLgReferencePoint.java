@@ -24,12 +24,17 @@ import org.jdiameter.common.impl.app.slg.ProvideLocationAnswerImpl;
 import org.jdiameter.common.impl.app.slg.SLgSessionFactoryImpl;
 import org.jdiameter.server.impl.app.slg.SLgServerSessionImpl;
 import org.mobicents.protocols.ss7.map.api.MAPException;
+import org.mobicents.protocols.ss7.map.api.service.lsm.AddGeographicalInformation;
 import org.mobicents.protocols.ss7.map.api.service.lsm.VelocityType;
 import org.mobicents.protocols.ss7.map.api.service.mobility.subscriberInformation.TypeOfShape;
+import org.mobicents.protocols.ss7.map.service.lsm.AddGeographicalInformationImpl;
 import org.mobicents.protocols.ss7.map.service.lsm.ExtGeographicalInformationImpl;
 import org.mobicents.protocols.ss7.map.service.lsm.VelocityEstimateImpl;
 import org.mobicents.servers.diameter.location.data.SubscriberElement;
 import org.mobicents.servers.diameter.location.data.SubscriberInformation;
+import org.mobicents.servers.diameter.location.data.elements.EllipsoidPoint;
+import org.mobicents.servers.diameter.location.data.elements.Polygon;
+import org.mobicents.servers.diameter.location.data.elements.PolygonImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,22 +144,40 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
         if (resultCode == ResultCode.SUCCESS) {
             try {
-                if (subscriberElement.locationEstimate != null) {
-                    plaAvpSet.addAvp(Avp.LOCATION_ESTIMATE,
-                        new ExtGeographicalInformationImpl(TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape),
-                            subscriberElement.locationEstimate.latitude,
-                            subscriberElement.locationEstimate.longitude,
-                            subscriberElement.locationEstimate.uncertainty,
-                            subscriberElement.locationEstimate.uncertaintySemiMajorAxis,
-                            subscriberElement.locationEstimate.uncertaintySemiMinorAxis,
-                            subscriberElement.locationEstimate.angleOfMajorAxis,
-                            subscriberElement.locationEstimate.confidence,
-                            subscriberElement.locationEstimate.altitude,
-                            subscriberElement.locationEstimate.uncertaintyAltitude,
-                            subscriberElement.locationEstimate.innerRadius,
-                            subscriberElement.locationEstimate.uncertaintyInnerRadius,
-                            subscriberElement.locationEstimate.offsetAngle,
-                            subscriberElement.locationEstimate.includedAngle).getData(),10415, true, false);
+                if (subscriberElement.locationEstimate != null || subscriberElement.addLocationEstimate !=null) {
+                    if (subscriberElement.locationEstimate != null &&
+                        TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape) != TypeOfShape.Polygon) {
+                        plaAvpSet.addAvp(Avp.LOCATION_ESTIMATE,
+                            new ExtGeographicalInformationImpl(TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape),
+                                subscriberElement.locationEstimate.latitude,
+                                subscriberElement.locationEstimate.longitude,
+                                subscriberElement.locationEstimate.uncertainty,
+                                subscriberElement.locationEstimate.uncertaintySemiMajorAxis,
+                                subscriberElement.locationEstimate.uncertaintySemiMinorAxis,
+                                subscriberElement.locationEstimate.angleOfMajorAxis,
+                                subscriberElement.locationEstimate.confidence,
+                                subscriberElement.locationEstimate.altitude,
+                                subscriberElement.locationEstimate.uncertaintyAltitude,
+                                subscriberElement.locationEstimate.innerRadius,
+                                subscriberElement.locationEstimate.uncertaintyInnerRadius,
+                                subscriberElement.locationEstimate.offsetAngle,
+                                subscriberElement.locationEstimate.includedAngle).getData(),10415, true, false);
+                    } else if (subscriberElement.addLocationEstimate !=null &&
+                        TypeOfShape.getInstance(subscriberElement.addLocationEstimate.typeOfShape) == TypeOfShape.Polygon) {
+                        EllipsoidPoint ellipsoidPoint1 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude1,
+                            subscriberElement.addLocationEstimate.longitude1);
+                        EllipsoidPoint ellipsoidPoint2 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude2,
+                            subscriberElement.addLocationEstimate.longitude2);
+                        EllipsoidPoint ellipsoidPoint3 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude3,
+                            subscriberElement.addLocationEstimate.longitude3);
+                        EllipsoidPoint ellipsoidPoint4 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude4,
+                            subscriberElement.addLocationEstimate.longitude4);
+                        EllipsoidPoint[] ellipsoidPoints = {ellipsoidPoint1, ellipsoidPoint2, ellipsoidPoint3, ellipsoidPoint4};
+                        Polygon polygon = new PolygonImpl();
+                        ((PolygonImpl) polygon).setData(ellipsoidPoints);
+                        AddGeographicalInformation additionalLocationEstimate = new AddGeographicalInformationImpl(polygon.getData());
+                        plaAvpSet.addAvp(Avp.LOCATION_ESTIMATE, additionalLocationEstimate.getData(),10415, true, false);
+                    }
                 }
 
                 if (subscriberElement.accuracyFulfilmentIndicator != null)
@@ -361,22 +384,40 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 lcsEpsClientName.addAvp(Avp.LCS_FORMAT_INDICATOR, subscriberElement.lcsEpsClientNameFormatInd, 10415, true, false, true);
             }
 
-            if (subscriberElement.locationEstimate != null) {
-                lrrAvpSet.addAvp(Avp.LOCATION_ESTIMATE,
-                    new ExtGeographicalInformationImpl(TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape),
-                        subscriberElement.locationEstimate.latitude,
-                        subscriberElement.locationEstimate.longitude,
-                        subscriberElement.locationEstimate.uncertainty,
-                        subscriberElement.locationEstimate.uncertaintySemiMajorAxis,
-                        subscriberElement.locationEstimate.uncertaintySemiMinorAxis,
-                        subscriberElement.locationEstimate.angleOfMajorAxis,
-                        subscriberElement.locationEstimate.confidence,
-                        subscriberElement.locationEstimate.altitude,
-                        subscriberElement.locationEstimate.uncertaintyAltitude,
-                        subscriberElement.locationEstimate.innerRadius,
-                        subscriberElement.locationEstimate.uncertaintyInnerRadius,
-                        subscriberElement.locationEstimate.offsetAngle,
-                        subscriberElement.locationEstimate.includedAngle).getData(), 10415, true, false);
+            if (subscriberElement.locationEstimate != null  || subscriberElement.addLocationEstimate !=null) {
+                if (subscriberElement.locationEstimate != null &&
+                    TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape) != TypeOfShape.Polygon) {
+                    lrrAvpSet.addAvp(Avp.LOCATION_ESTIMATE,
+                        new ExtGeographicalInformationImpl(TypeOfShape.getInstance(subscriberElement.locationEstimate.typeOfShape),
+                            subscriberElement.locationEstimate.latitude,
+                            subscriberElement.locationEstimate.longitude,
+                            subscriberElement.locationEstimate.uncertainty,
+                            subscriberElement.locationEstimate.uncertaintySemiMajorAxis,
+                            subscriberElement.locationEstimate.uncertaintySemiMinorAxis,
+                            subscriberElement.locationEstimate.angleOfMajorAxis,
+                            subscriberElement.locationEstimate.confidence,
+                            subscriberElement.locationEstimate.altitude,
+                            subscriberElement.locationEstimate.uncertaintyAltitude,
+                            subscriberElement.locationEstimate.innerRadius,
+                            subscriberElement.locationEstimate.uncertaintyInnerRadius,
+                            subscriberElement.locationEstimate.offsetAngle,
+                            subscriberElement.locationEstimate.includedAngle).getData(), 10415, true, false);
+                }  else if (subscriberElement.addLocationEstimate !=null &&
+                    TypeOfShape.getInstance(subscriberElement.addLocationEstimate.typeOfShape) == TypeOfShape.Polygon) {
+                        EllipsoidPoint ellipsoidPoint1 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude1,
+                            subscriberElement.addLocationEstimate.longitude1);
+                        EllipsoidPoint ellipsoidPoint2 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude2,
+                            subscriberElement.addLocationEstimate.longitude2);
+                        EllipsoidPoint ellipsoidPoint3 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude3,
+                            subscriberElement.addLocationEstimate.longitude3);
+                        EllipsoidPoint ellipsoidPoint4 = new EllipsoidPoint(subscriberElement.addLocationEstimate.latitude4,
+                            subscriberElement.addLocationEstimate.longitude4);
+                        EllipsoidPoint[] ellipsoidPoints = {ellipsoidPoint1, ellipsoidPoint2, ellipsoidPoint3, ellipsoidPoint4};
+                        Polygon polygon = new PolygonImpl();
+                        ((PolygonImpl) polygon).setData(ellipsoidPoints);
+                        AddGeographicalInformation additionalLocationEstimate = new AddGeographicalInformationImpl(polygon.getData());
+                        lrrAvpSet.addAvp(Avp.LOCATION_ESTIMATE, additionalLocationEstimate.getData(),10415, true, false);
+                }
             }
 
             if (subscriberElement.accuracyFulfilmentIndicator != null)
