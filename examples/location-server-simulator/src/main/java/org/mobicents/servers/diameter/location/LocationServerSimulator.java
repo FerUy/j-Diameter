@@ -120,10 +120,15 @@ public class LocationServerSimulator {
             get("/lrr", new RouteImpl("/lrr") {
                 @Override
                 public Object handle(Request request, Response response) throws Exception {
-                    String msisdn = request.queryParams("msisdn");
+                    Boolean isImsi = false;
+                    String subscriberIdentity = request.queryParams("msisdn");
+                    if (subscriberIdentity == null) {
+                        subscriberIdentity = request.queryParams("imsi");
+                        isImsi = true;
+                    }
                     String locationEvent = request.queryParams("locationEvent");
                     String lcsReferenceNumber = request.queryParams("lcsReferenceNumber");
-                    return locationServerSimulator.sendLocationReportRequest(msisdn, locationEvent, lcsReferenceNumber);
+                    return locationServerSimulator.sendLocationReportRequest(subscriberIdentity, locationEvent, lcsReferenceNumber, isImsi);
                 }
             });
 
@@ -140,7 +145,7 @@ public class LocationServerSimulator {
                 } else if (command.startsWith("lrr ")) {
                     locationServerSimulator.sendLocationReportRequest(command);
                 } else if (command.equals("?") || command.equals("help")) {
-                    System.out.println("lrr <msisdn> <type> <ref-num>, exit and help are the only commands");
+                    System.out.println("lrr <msisdn> <imsi> <type> <ref-num>, exit and help are the only commands");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -209,18 +214,18 @@ public class LocationServerSimulator {
 
         String[] commandParameter = command.split(" ");
 
-        String msisdn = commandParameter[1];
+        String subscriberIdentity = commandParameter[1];
         Integer locationEventType = Integer.parseInt(commandParameter[2]);    // MO_LR(2)
         String lcsReferenceNumber = commandParameter[3];
 
-        this.slgMobilityManagementEntity.sendLocationReportRequest(msisdn, locationEventType, lcsReferenceNumber);
+        this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, lcsReferenceNumber, false);
     }
 
-    public String sendLocationReportRequest(String msisdn, String locationEvent, String lcsReferenceNumber) {
+    public String sendLocationReportRequest(String subscriberIdentity, String locationEvent, String lcsReferenceNumber, Boolean isImsi) {
         String result = "\nLRR sent successfully!\n";
         try {
             Integer locationEventType = Integer.parseInt(locationEvent);
-            this.slgMobilityManagementEntity.sendLocationReportRequest(msisdn, locationEventType, lcsReferenceNumber);
+            this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, lcsReferenceNumber, isImsi);
         } catch (Exception e) {
             result = String.format("\nLRR caused an exception '%s' - not sent!\n", e.getMessage());
         }

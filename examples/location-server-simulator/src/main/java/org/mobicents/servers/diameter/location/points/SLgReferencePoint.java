@@ -344,7 +344,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
     }
 
-    public void sendLocationReportRequest(String msisdn, Integer locationEventType, String lcsReferenceNumber)
+    public void sendLocationReportRequest(String subscriberIdentity, Integer locationEventType, String lcsReferenceNumber, Boolean isImsi)
             throws InternalException, RouteException, OverloadException, IllegalDiameterStateException {
 
         int resultCode = ResultCode.SUCCESS;
@@ -355,7 +355,11 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
         SubscriberElement subscriberElement;
         try {
-            subscriberElement = subscriberInformation.getElementBySubscriber("", msisdn);
+
+            if (isImsi)
+                subscriberElement = subscriberInformation.getElementBySubscriber(subscriberIdentity, "");
+            else
+                subscriberElement = subscriberInformation.getElementBySubscriber("", subscriberIdentity);
 
             String sessionId = UUID.randomUUID().toString();
             ServerSLgSession session = ((ISessionFactory) this.sessionFactory).getNewAppSession(sessionId,
