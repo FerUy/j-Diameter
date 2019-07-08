@@ -55,6 +55,10 @@ public class SubscriberInformation {
     }
 
     public SubscriberElement getElementBySubscriber(String imsi, String msisdn) throws Exception {
+
+        if (msisdn.equalsIgnoreCase("0") || imsi.equalsIgnoreCase("0") )
+            throw new Exception("ApplicationUnsupported");
+
         for (SubscriberElement subscriber: subscribers) {
             if (subscriber.imsi.equals(imsi) || subscriber.msisdn.equals(msisdn)) {
                 if ((imsi == null || imsi.length() == 0) && subscriber.msisdn.equals(msisdn)) {
@@ -72,35 +76,39 @@ public class SubscriberInformation {
     }
 
     public String getUserDataBySubscriber(String msisdn) throws Exception {
-        try {
-            String localSubscriberUserDataFile = System.getProperty("user.dir") + "/sh-user-data/" + msisdn + ".xml";
 
-            File file = new File(localSubscriberUserDataFile);
-            BufferedReader bufferedReader;
-            if (file.exists()) {
-                logger.info("Loading subscriber user data from '" + localSubscriberUserDataFile + "' local file.");
-                bufferedReader = new BufferedReader(new FileReader(file));
-            } else {
-                localSubscriberUserDataFile = "sh-user-data/" + msisdn + ".xml";
-                logger.info("Loading subscriber user data from internal 'resources/" + localSubscriberUserDataFile + "' file.");
-                ClassLoader classLoader = SubscriberInformation.class.getClassLoader();
-                InputStream inputStream = classLoader.getResourceAsStream(localSubscriberUserDataFile);
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        if (msisdn.equalsIgnoreCase("0")) {
+            throw new Exception("ApplicationUnsupported");
+        } else {
+            try {
+                String localSubscriberUserDataFile = System.getProperty("user.dir") + "/sh-user-data/" + msisdn + ".xml";
+
+                File file = new File(localSubscriberUserDataFile);
+                BufferedReader bufferedReader;
+                if (file.exists()) {
+                    logger.info("Loading subscriber user data from '" + localSubscriberUserDataFile + "' local file.");
+                    bufferedReader = new BufferedReader(new FileReader(file));
+                } else {
+                    localSubscriberUserDataFile = "sh-user-data/" + msisdn + ".xml";
+                    logger.info("Loading subscriber user data from internal 'resources/" + localSubscriberUserDataFile + "' file.");
+                    ClassLoader classLoader = SubscriberInformation.class.getClassLoader();
+                    InputStream inputStream = classLoader.getResourceAsStream(localSubscriberUserDataFile);
+                    bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                }
+
+                StringBuffer subscriberUserDataBuffer = new StringBuffer();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    subscriberUserDataBuffer.append(line).append("\n");
+                }
+                logger.info("Loaded " + subscriberUserDataBuffer.length() + " bytes from subscriber user data file.");
+
+                return subscriberUserDataBuffer.toString();
+            } catch (Exception e) {
+                logger.warn("Subscriber information load error, not found!");
+                throw new Exception("SubscriberNotFound");
             }
-
-            StringBuffer subscriberUserDataBuffer = new StringBuffer();
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                subscriberUserDataBuffer.append(line).append("\n");
-            }
-            logger.info("Loaded " + subscriberUserDataBuffer.length() + " bytes from subscriber user data file.");
-
-            return subscriberUserDataBuffer.toString();
-        } catch (Exception e) {
-            logger.warn("Subscriber information load error, not found!");
-            throw new Exception("SubscriberNotFound");
         }
-        //throw new Exception("SubscriberNotFound");
     }
 
 }

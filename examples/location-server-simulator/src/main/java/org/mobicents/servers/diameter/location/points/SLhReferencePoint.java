@@ -13,9 +13,11 @@ import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Request;
 import org.jdiameter.api.ResultCode;
 import org.jdiameter.api.RouteException;
+import org.jdiameter.api.app.AppAnswerEvent;
 import org.jdiameter.api.slh.ServerSLhSession;
 import org.jdiameter.api.slh.events.LCSRoutingInfoAnswer;
 import org.jdiameter.api.slh.events.LCSRoutingInfoRequest;
+import org.jdiameter.common.impl.app.AppAnswerEventImpl;
 import org.jdiameter.common.impl.app.slh.LCSRoutingInfoAnswerImpl;
 import org.jdiameter.common.impl.app.slh.SLhSessionFactoryImpl;
 import org.jdiameter.server.impl.app.slh.SLhServerSessionImpl;
@@ -118,10 +120,12 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
             if (subscriberElement.locationResult == 4201)
                 resultCode = DIAMETER_ERROR_ABSENT_USER;
         } catch (Exception e) {
-            if (e.getMessage().equals("SubscriberCoherentData"))
+            if (e.getMessage().equals("SubscriberIncoherentData"))
                 resultCode = ResultCode.CONTRADICTING_AVPS;
             else if (e.getMessage().equals("SubscriberNotFound"))
                 resultCode = DIAMETER_ERROR_USER_UNKNOWN;
+            if (e.getMessage().equals("ApplicationUnsupported"))
+                resultCode = ResultCode.APPLICATION_UNSUPPORTED;
         }
 
         LCSRoutingInfoAnswer ria = new LCSRoutingInfoAnswerImpl((Request) rir.getMessage(), resultCode);
@@ -179,26 +183,24 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
             riaAvpSet.addAvp(Avp.RIA_FLAGS, subscriberElement.riaFlags, 10415, true, false, true);
         }
 
-        if (logger.isInfoEnabled()) {
-            if (resultCode == DIAMETER_ERROR_USER_UNKNOWN)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                    " (DIAMETER_ERROR_USER_UNKNOWN)");
-            else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                    " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
-            else if (resultCode == DIAMETER_ERROR_ABSENT_USER)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                    " (DIAMETER_ERROR_ABSENT_USER)");
-            else if (resultCode == ResultCode.UNABLE_TO_DELIVER)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                    " (UNABLE_TO_DELIVER)");
-            else if (resultCode == ResultCode.SUCCESS)
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                    " (SUCCESS)");
-            else
-                logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:"+ resultCode);
+        if (resultCode == DIAMETER_ERROR_USER_UNKNOWN) {
+            logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                " (DIAMETER_ERROR_USER_UNKNOWN)");
         }
-
+        else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK) {
+            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+                " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
+        }
+        else if (resultCode == DIAMETER_ERROR_ABSENT_USER) {
+            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+                " (DIAMETER_ERROR_ABSENT_USER)");
+        }
+        else if (resultCode == ResultCode.SUCCESS) {
+            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+                " (SUCCESS)");
+        } else {
+            logger.info("<> Sending Error-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode);
+        }
         session.sendLCSRoutingInfoAnswer(ria);
     }
 

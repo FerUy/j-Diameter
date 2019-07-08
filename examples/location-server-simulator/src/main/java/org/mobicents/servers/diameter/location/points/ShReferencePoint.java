@@ -20,6 +20,7 @@ import org.jdiameter.api.app.AppSession;
 import org.jdiameter.api.sh.ServerShSession;
 import org.jdiameter.api.sh.events.UserDataRequest;
 import org.jdiameter.api.sh.events.UserDataAnswer;
+import org.jdiameter.common.impl.app.AppAnswerEventImpl;
 import org.jdiameter.common.impl.app.sh.ShSessionFactoryImpl;
 import org.jdiameter.common.impl.app.sh.UserDataAnswerImpl;
 import org.jdiameter.server.impl.app.sh.ShServerSessionImpl;
@@ -136,6 +137,8 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
         } catch (Exception e) {
             if (e.getMessage().equals("SubscriberNotFound"))
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
+            if (e.getMessage().equals("ApplicationUnsupported"))
+                resultCode = ResultCode.APPLICATION_UNSUPPORTED;
         }
 
         UserDataAnswer uda = new UserDataAnswerImpl((Request) udr.getMessage(), resultCode);
@@ -144,147 +147,131 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
         if (resultCode == ResultCode.SUCCESS) {
             try {
                 udaAvpSet.addAvp(Avp.USER_DATA_SH, userData, 10415, true, false, true);
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (SUCCESS)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 logger.info(">< Error generating UDA] User-Data-Answer", e);
             }
         }
-
-        if (logger.isInfoEnabled()) {
-            if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_OPERATION_NOT_ALLOWED) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_OPERATION_NOT_ALLOWED)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_SUBS_DATA_ABSENT) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_SUBS_DATA_ABSENT)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_DSAI_NOT_AVAILABLE) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_DSAI_NOT_AVAILABLE)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_IDENTITIES_DONT_MATCH) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_IDENTITIES_DONT_MATCH)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_ERROR_TOO_MUCH_DATA) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_ERROR_TOO_MUCH_DATA)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_USER_DATA_NOT_AVAILABLE) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_USER_DATA_NOT_AVAILABLE)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == DIAMETER_PRIOR_UPDATE_IN_PROGRESS) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (DIAMETER_PRIOR_UPDATE_IN_PROGRESS)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == ResultCode.UNABLE_TO_DELIVER) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (UNABLE_TO_DELIVER)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else if (resultCode == ResultCode.SUCCESS) {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                        " (SUCCESS)");
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                try {
-                    logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode);
-                } catch (AvpDataException e) {
-                    e.printStackTrace();
-                }
+        if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
             }
         }
-
+        else if (resultCode == DIAMETER_ERROR_OPERATION_NOT_ALLOWED) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_OPERATION_NOT_ALLOWED)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_READ)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_MODIFIED)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_USER_DATA_CANNOT_BE_NOTIFIED_ON_CHANGES)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_TRANSPARENT_DATA_OUT_OF_SYNC)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_SUBS_DATA_ABSENT) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_SUBS_DATA_ABSENT)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_NO_SUBSCRIPTION_TO_DATA)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_DSAI_NOT_AVAILABLE) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_DSAI_NOT_AVAILABLE)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_IDENTITIES_DONT_MATCH) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_IDENTITIES_DONT_MATCH)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_ERROR_TOO_MUCH_DATA) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_ERROR_TOO_MUCH_DATA)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_USER_DATA_NOT_AVAILABLE) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_USER_DATA_NOT_AVAILABLE)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (resultCode == DIAMETER_PRIOR_UPDATE_IN_PROGRESS) {
+            try {
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                    " (DIAMETER_PRIOR_UPDATE_IN_PROGRESS)");
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                logger.warn("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode);
+            } catch (AvpDataException e) {
+                e.printStackTrace();
+            }
+        }
         session.sendUserDataAnswer(uda);
     }
 
     @Override
     public void doOtherEvent(AppSession session, AppRequestEvent request, AppAnswerEvent answer)
             throws InternalException, IllegalDiameterStateException, RouteException, OverloadException {
-
+        logger.info("Diameter Sh Session Factory :: doOtherEvent :: appSession[{}], Request[{}], Answer[{}]",
+            new Object[] { session, request, answer });
     }
 }
