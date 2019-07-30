@@ -2,11 +2,11 @@
 <Configuration xmlns="http://www.jdiameter.org/jdiameter-server">
 
   <LocalPeer>
-    <URI value="aaa://simulator:8011" />
+    <URI value="aaa://dra.simulator:3868" />
     <IPAddresses>
       <IPAddress value="127.0.0.1" />
     </IPAddresses>
-    <Realm value="restcomm.org" />
+    <Realm value="epc.mnc000.mcc000.3gppnetwork.org" />
     <VendorID value="10415" />
     <ProductName value="Location Server Simulator" />
     <FirmwareRevision value="1" />
@@ -30,7 +30,7 @@
 
   <Network>
     <Peers>
-      <Peer name="aaa://gmlc" attempt_connect="false" rating="1" />
+      <Peer name="aaa://gmlc:3868" attempt_connect="false" rating="1" />
     </Peers>
     <Realms>
       <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
