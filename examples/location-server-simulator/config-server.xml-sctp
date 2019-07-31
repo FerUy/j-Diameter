@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<Configuration xmlns="http://www.jdiameter.org/jdiameter-server">
+
+  <LocalPeer>
+    <URI value="aaa://dra.simulator:23868" />
+    <IPAddresses>
+      <IPAddress value="127.0.0.1" />
+    </IPAddresses>
+    <Realm value="epc.mnc000.mcc000.3gppnetwork.org" />
+    <VendorID value="10415" />
+    <ProductName value="Location Server Simulator" />
+    <FirmwareRevision value="1" />
+  </LocalPeer>
+
+  <Parameters>
+    <AcceptUndefinedPeer value="false" />
+    <DuplicateProtection value="true" />
+    <DuplicateTimer value="240000" />
+    <UseUriAsFqdn value="true" />
+    <!-- Needed for Ericsson Emulator -->
+    <QueueSize value="10000" />
+    <MessageTimeOut value="60000" />
+    <StopTimeOut value="10000" />
+    <CeaTimeOut value="10000" />
+    <IacTimeOut value="30000" />
+    <DwaTimeOut value="10000" />
+    <DpaTimeOut value="5000" />
+    <RecTimeOut value="10000" />
+  </Parameters>
+
+  <Network>
+    <Peers>
+      <Peer name="aaa://gmlc:3868" attempt_connect="false" rating="1" />
+    </Peers>
+    <Realms>
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777255" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm>
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777291" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm>
+      <Realm name="restcomm.org" peers="gmlc" local_action="LOCAL" dynamic="true" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777217" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm>
+    </Realms>
+  </Network>
+
+  <!--Security /-->
+
+  <Extensions>
+    <!-- Set SCTP classes as extension points for Connection and Network Guard -->
+    <Connection value="org.jdiameter.client.impl.transport.sctp.SCTPClientConnection" />
+    <NetworkGuard value="org.jdiameter.server.impl.io.sctp.NetworkGuard" />
+  </Extensions>
+
+</Configuration>
+
