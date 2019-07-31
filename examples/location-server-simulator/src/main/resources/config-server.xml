@@ -2,7 +2,7 @@
 <Configuration xmlns="http://www.jdiameter.org/jdiameter-server">
 
   <LocalPeer>
-    <URI value="aaa://dra.simulator:3868" />
+    <URI value="aaa://dra.simulator:23868" />
     <IPAddresses>
       <IPAddress value="127.0.0.1" />
     </IPAddresses>
