@@ -306,9 +306,12 @@ public class PeerImpl extends AbstractPeer implements IPeer {
       try {
         Peer local = metaData.getLocalPeer();
         if (local.getIPAddresses() != null && local.getIPAddresses().length > 0) {
-          localAddress = local.getIPAddresses()[0];
-        }
-        else {
+          //localAddress = local.getIPAddresses()[0];
+          if (ip != null) {
+            logger.info("Using '" + ip + "' as local address for host");
+            localAddress = InetAddress.getByName(ip);
+          }
+        } else {
           localAddress = InetAddress.getByName(metaData.getLocalPeer().getUri().getFQDN());
         }
       }
