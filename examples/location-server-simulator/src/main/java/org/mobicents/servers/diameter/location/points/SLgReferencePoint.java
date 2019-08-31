@@ -13,14 +13,12 @@ import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Request;
 import org.jdiameter.api.ResultCode;
 import org.jdiameter.api.RouteException;
-import org.jdiameter.api.app.AppAnswerEvent;
 import org.jdiameter.api.slg.ServerSLgSession;
 import org.jdiameter.api.slg.events.LocationReportAnswer;
 import org.jdiameter.api.slg.events.LocationReportRequest;
 import org.jdiameter.api.slg.events.ProvideLocationAnswer;
 import org.jdiameter.api.slg.events.ProvideLocationRequest;
 import org.jdiameter.client.api.ISessionFactory;
-import org.jdiameter.common.impl.app.AppAnswerEventImpl;
 import org.jdiameter.common.impl.app.slg.LocationReportRequestImpl;
 import org.jdiameter.common.impl.app.slg.ProvideLocationAnswerImpl;
 import org.jdiameter.common.impl.app.slg.SLgSessionFactoryImpl;
@@ -129,14 +127,20 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Generating [PLA] Provide-Location-Answer response data");
+            logger.info("<> Generating [PLA] Provide-Location-Answer response data for MSISDN="+msisdn+", IMSI="+imsi);
         }
 
         SubscriberElement subscriberElement = null;
         try {
             subscriberElement = subscriberInformation.getElementBySubscriber(imsi, msisdn);
-            resultCode = subscriberElement.locationResult;
+            if (subscriberElement != null) {
+                resultCode = subscriberElement.locationResult;
+            } else {
+                resultCode = DIAMETER_ERROR_UNREACHABLE_USER;
+            }
         } catch (Exception e) {
+            if (e.getMessage().equals("SubscriberIncoherentData"))
+                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
             if (e.getMessage().equals("SubscriberNotFound"))
                 resultCode = DIAMETER_ERROR_USER_UNKNOWN;
             if (e.getMessage().equals("ApplicationUnsupported"))

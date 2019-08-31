@@ -68,7 +68,7 @@ public class SubscriberInformation {
                 } else if (subscriber.imsi.equals(imsi) && subscriber.msisdn.equals(msisdn)) {
                     return subscriber;
                 } else {
-                    throw new Exception("SubscriberCoherentData");
+                    throw new Exception("SubscriberIncoherentData");
                 }
             }
         }
@@ -104,6 +104,7 @@ public class SubscriberInformation {
                 logger.info("Loaded " + subscriberUserDataBuffer.length() + " bytes from subscriber user data file.");
 
                 return subscriberUserDataBuffer.toString();
+
             } catch (Exception e) {
                 logger.warn("Subscriber information load error, not found!");
                 throw new Exception("SubscriberNotFound");

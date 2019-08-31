@@ -29,6 +29,9 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import static org.mobicents.servers.diameter.utils.TBCDUtil.parseTBCD;
+import static org.mobicents.servers.diameter.utils.TBCDUtil.toTBCDString;
+
 /**
  * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
@@ -101,7 +104,12 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         }
 
         if (rirAvpSet.getAvp(Avp.MSISDN) != null) {
-            msisdn = rirAvpSet.getAvp(Avp.MSISDN).getUTF8String();
+            try {
+                byte[] msisdnArray = rirAvpSet.getAvp(Avp.MSISDN).getOctetString();
+                msisdn = toTBCDString(msisdnArray);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (rirAvpSet.getAvp(Avp.GMLC_NUMBER) != null) {
@@ -109,7 +117,7 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Generating [RIA] Routing-Info-Answer response data");
+            logger.info("<> Generating [RIA] Routing-Info-Answer response data for MSISDN="+msisdn+", IMSI="+imsi);
         }
 
         SubscriberElement subscriberElement = null;
@@ -121,8 +129,8 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
                 resultCode = DIAMETER_ERROR_ABSENT_USER;
         } catch (Exception e) {
             if (e.getMessage().equals("SubscriberIncoherentData"))
-                resultCode = ResultCode.CONTRADICTING_AVPS;
-            else if (e.getMessage().equals("SubscriberNotFound"))
+                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
+            if (e.getMessage().equals("SubscriberNotFound"))
                 resultCode = DIAMETER_ERROR_USER_UNKNOWN;
             if (e.getMessage().equals("ApplicationUnsupported"))
                 resultCode = ResultCode.APPLICATION_UNSUPPORTED;
@@ -139,7 +147,7 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
             riaAvpSet.addAvp(Avp.LMSI, subscriberElement.lmsi, 10415, true, false, true);
 
             AvpSet servingNode = riaAvpSet.addGroupedAvp(Avp.SERVING_NODE, 10415, false, false);
-            // contain the ISDN number of the serving MSC or MSC server in international number format
+            // contains the ISDN number of the serving MSC or MSC server in international number format
             servingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.servingNode.sgsnNumber, 10415, true, false, true);
             servingNode.addAvp(Avp.SGSN_NAME, subscriberElement.servingNode.sgsnName, 10415, false, false,false);
             servingNode.addAvp(Avp.SGSN_REALM, subscriberElement.servingNode.sgsnRealm, 10415, false, false,false);

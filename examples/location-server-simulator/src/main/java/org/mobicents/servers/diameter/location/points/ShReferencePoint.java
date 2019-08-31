@@ -122,7 +122,7 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
 
         if (logger.isInfoEnabled()) {
             if (publicIdentity != null)
-                logger.info("<> Generating [UDA] User-Data-Answer response data for MSISDN=" + msisdn + ", and/or IMSPublicIdentity= " + publicIdentity);
+                logger.info("<> Generating [UDA] User-Data-Answer response data for MSISDN=" + msisdn + ", and/or IMSPublicIdentity=" + publicIdentity);
             else
                 logger.info("<> Generating [UDA] User-Data-Answer response data for MSISDN=" + msisdn);
         }
@@ -135,6 +135,8 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             else
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
         } catch (Exception e) {
+            if (e.getMessage().equals("SubscriberIncoherentData"))
+                resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
             if (e.getMessage().equals("SubscriberNotFound"))
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
             if (e.getMessage().equals("ApplicationUnsupported"))
