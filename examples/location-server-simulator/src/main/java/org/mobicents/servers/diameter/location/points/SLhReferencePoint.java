@@ -88,9 +88,8 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
 
         int resultCode = ResultCode.SUCCESS;
 
-        Integer gmlcNumber = 0;
-        String msisdn = "";
-        String imsi = "";
+        Long gmlcNumber = null;
+        String msisdn = "", imsi = "";
 
         if (logger.isInfoEnabled()) {
             logger.info("<> Processing [RIR] Routing-Info-Request for request [" + rir + "] from " +rir.getOriginHost() + "@" +rir.getOriginRealm() +
@@ -100,7 +99,11 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         AvpSet rirAvpSet = rir.getMessage().getAvps();
 
         if (rirAvpSet.getAvp(Avp.USER_NAME) != null) {
-            imsi = rirAvpSet.getAvp(Avp.USER_NAME).getUTF8String();
+            try {
+                imsi = rirAvpSet.getAvp(Avp.USER_NAME).getUTF8String();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (rirAvpSet.getAvp(Avp.MSISDN) != null) {
@@ -113,16 +116,35 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         }
 
         if (rirAvpSet.getAvp(Avp.GMLC_NUMBER) != null) {
-            gmlcNumber = rirAvpSet.getAvp(Avp.GMLC_NUMBER).getInteger32();
+            try {
+                byte[] gmlcNumberOctet = rirAvpSet.getAvp(Avp.GMLC_NUMBER).getOctetString();
+                gmlcNumber = Long.valueOf(toTBCDString(gmlcNumberOctet));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (logger.isInfoEnabled()) {
-            logger.info("<> Generating [RIA] Routing-Info-Answer response data for MSISDN="+msisdn+", IMSI="+imsi);
+            if (msisdn != null && !msisdn.equals("")) {
+                if (gmlcNumber != null)
+                    logger.info("<> Generating [RIA] Routing-Info-Answer response data for MSISDN=" + msisdn + ", GMLC-Number=" + gmlcNumber);
+                else
+                    logger.info("<> Generating [RIA] Routing-Info-Answer response data for MSISDN=" + msisdn);
+            } else {
+                if (gmlcNumber != null)
+                    logger.info("<> Generating [RIA] Routing-Info-Answer response data for IMSI=" + imsi + ", GMLC-Number=" + gmlcNumber);
+                else
+                    logger.info("<> Generating [RIA] Routing-Info-Answer response data for IMSI=" + imsi);
+            }
         }
 
         SubscriberElement subscriberElement = null;
         try {
             subscriberElement = subscriberInformation.getElementBySubscriber(imsi, msisdn);
+            if (subscriberElement == null) {
+                logger.info("subscriberElement = subscriberInformation.getElementBySubscriber(imsi, msisdn) is NULL!!!");
+                resultCode = DIAMETER_ERROR_USER_UNKNOWN;
+            }
             if (subscriberElement.locationResult == 5490)
                 resultCode = DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK;
             if (subscriberElement.locationResult == 4201)

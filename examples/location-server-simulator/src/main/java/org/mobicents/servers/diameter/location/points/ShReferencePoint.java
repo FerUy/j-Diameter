@@ -29,6 +29,9 @@ import org.mobicents.servers.diameter.location.data.SubscriberInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.mobicents.servers.diameter.utils.TBCDUtil.parseTBCD;
+import static org.mobicents.servers.diameter.utils.TBCDUtil.toTBCDString;
+
 /**
  * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
@@ -104,6 +107,8 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
                     " and session-id [" + session.getSessionId() +"]");
             } catch (AvpDataException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
@@ -113,9 +118,16 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             try {
                 if (udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.MSISDN) != null)
                     msisdn = udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.MSISDN).getUTF8String();
+                logger.info("USER_IDENTITY AVP MSISDN=" + msisdn);
+                byte[] tbcd = parseTBCD(msisdn);
+                msisdn = toTBCDString(tbcd);
+                logger.info("TBCD MSISDN=" + msisdn);
                 if (udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.PUBLIC_IDENTITY) != null)
                     publicIdentity = udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.PUBLIC_IDENTITY).getUTF8String();
+                logger.info("USER_IDENTITY AVP IMSPublicIdentity=" + publicIdentity);
             } catch (AvpDataException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
