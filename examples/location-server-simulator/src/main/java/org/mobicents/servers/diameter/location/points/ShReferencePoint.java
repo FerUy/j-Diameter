@@ -144,6 +144,8 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             else
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
         } catch (Exception e) {
+            if (e.getMessage().equals("OperationNotAllowed"))
+                resultCode = DIAMETER_ERROR_OPERATION_NOT_ALLOWED;
             if (e.getMessage().equals("SubscriberIncoherentData"))
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
             if (e.getMessage().equals("SubscriberNotFound"))
@@ -166,7 +168,7 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
                 logger.info(">< Error generating UDA] User-Data-Answer", e);
             }
         }
-        if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED) {
+        else if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED) {
             try {
                 logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
                     " (DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED)");
@@ -175,8 +177,13 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
             }
         }
         else if (resultCode == DIAMETER_ERROR_OPERATION_NOT_ALLOWED) {
+            udaAvpSet.removeAvp(Avp.RESULT_CODE);
+            udaAvpSet.addAvp(Avp.AUTH_SESSION_STATE, 0, 0, true, false, true);
+            AvpSet experimentalResult = udaAvpSet.addGroupedAvp(Avp.EXPERIMENTAL_RESULT, true, false);
+            experimentalResult.addAvp(Avp.EXPERIMENTAL_RESULT_CODE, DIAMETER_ERROR_OPERATION_NOT_ALLOWED, true, true);
+            experimentalResult.addAvp(Avp.VENDOR_ID, 10415, true, false);
             try {
-                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
+                logger.info("<> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with experimental result code:" + resultCode +
                     " (DIAMETER_ERROR_OPERATION_NOT_ALLOWED)");
             } catch (AvpDataException e) {
                 e.printStackTrace();

@@ -289,9 +289,14 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
                     + resultCode + " (DIAMETER_ERROR_UNREACHABLE_USER)");
         } else if (resultCode == DIAMETER_ERROR_SUSPENDED_USER) {
+            plaAvpSet.removeAvp(Avp.RESULT_CODE);
+            plaAvpSet.addAvp(Avp.AUTH_SESSION_STATE, 0, 0, true, false, true);
+            AvpSet experimentalResult = plaAvpSet.addGroupedAvp(Avp.EXPERIMENTAL_RESULT, true, false);
+            experimentalResult.addAvp(Avp.EXPERIMENTAL_RESULT_CODE, DIAMETER_ERROR_SUSPENDED_USER, true, true);
+            experimentalResult.addAvp(Avp.VENDOR_ID, 10415, true, false);
             if (lcsReferenceNumber != null)
                 logger.info("<> Sending [PLA] Provide-Location-Answer with LCS-Reference-Number:" + lcsReferenceNumber +
-                    " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and result code:" + resultCode + " (DIAMETER_ERROR_SUSPENDED_USER)");
+                    " to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " and experimental result code:" + resultCode + " (DIAMETER_ERROR_SUSPENDED_USER)");
             else
                 logger.info("<> Sending [PLA] Provide-Location-Answer to " + plr.getOriginHost() + "@" +plr.getOriginRealm() + " with result code:"
                     + resultCode + " (DIAMETER_ERROR_SUSPENDED_USER)");

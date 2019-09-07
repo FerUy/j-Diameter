@@ -17,6 +17,7 @@ import org.jdiameter.api.app.AppAnswerEvent;
 import org.jdiameter.api.slh.ServerSLhSession;
 import org.jdiameter.api.slh.events.LCSRoutingInfoAnswer;
 import org.jdiameter.api.slh.events.LCSRoutingInfoRequest;
+import org.jdiameter.common.api.app.auth.ClientAuthSessionState;
 import org.jdiameter.common.impl.app.AppAnswerEventImpl;
 import org.jdiameter.common.impl.app.slh.LCSRoutingInfoAnswerImpl;
 import org.jdiameter.common.impl.app.slh.SLhSessionFactoryImpl;
@@ -160,8 +161,9 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
 
         LCSRoutingInfoAnswer ria = new LCSRoutingInfoAnswerImpl((Request) rir.getMessage(), resultCode);
 
+        AvpSet riaAvpSet = ria.getMessage().getAvps();
+
         if (resultCode == ResultCode.SUCCESS) {
-            AvpSet riaAvpSet = ria.getMessage().getAvps();
 
             riaAvpSet.addAvp(Avp.USER_NAME, subscriberElement.imsi, 10415, true, false, false);
             riaAvpSet.addAvp(Avp.MSISDN, subscriberElement.msisdn, 10415, true, false, true);
@@ -211,6 +213,7 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
             riaAvpSet.addAvp(Avp.GMLC_ADDRESS, subscriberElement.gmlcAddress, 10415, true, false, true);
             riaAvpSet.addAvp(Avp.PPR_ADDRESS, subscriberElement.pprAddress, 10415, true, false, true);
             riaAvpSet.addAvp(Avp.RIA_FLAGS, subscriberElement.riaFlags, 10415, true, false, true);
+            riaAvpSet.addAvp(Avp.AUTH_SESSION_STATE, 0, 0, true, false, true);
         }
 
         if (resultCode == DIAMETER_ERROR_USER_UNKNOWN) {
@@ -218,7 +221,13 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
                 " (DIAMETER_ERROR_USER_UNKNOWN)");
         }
         else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK) {
-            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+            riaAvpSet.removeAvp(Avp.RESULT_CODE);
+            riaAvpSet.addAvp(Avp.AUTH_SESSION_STATE, 0, 0, true, false, true);
+            AvpSet experimentalResult = riaAvpSet.addGroupedAvp(Avp.EXPERIMENTAL_RESULT, true, false);
+            experimentalResult.addAvp(Avp.EXPERIMENTAL_RESULT_CODE, DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK, true, true);
+            experimentalResult.addAvp(Avp.VENDOR_ID, 10415, true, false);
+
+            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with experimental result code:" + resultCode +
                 " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
         }
         else if (resultCode == DIAMETER_ERROR_ABSENT_USER) {

@@ -6,10 +6,10 @@ package org.mobicents.servers.diameter.location.data.elements;
  */
 public class ServingNode {
     public String sgsnNumber = "5989900021";
-    public String sgsnName = "simulator.be-connect.us";
-    public String sgsnRealm = "be-connect.us";
-    public String mmeName = "simulator.be-connect.us";
-    public String mmeRealm = "be-connect.us";
+    public String sgsnName = "simulator";
+    public String sgsnRealm = "restcomm.org";
+    public String mmeName = "simulator";
+    public String mmeRealm = "restcomm.org";
     public String mscNumber = "5989900008";
     public String tgppAAAServerName = "aaa003";
     public Integer lcsCapabilitySets = 1;
