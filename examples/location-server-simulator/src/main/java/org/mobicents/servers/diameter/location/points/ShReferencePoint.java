@@ -116,15 +116,12 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
 
         if (udrAvpSet.getAvp(Avp.USER_IDENTITY) != null) {
             try {
+                byte[] msisdnByteArray = null;
                 if (udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.MSISDN) != null)
-                    msisdn = udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.MSISDN).getUTF8String();
-                logger.info("USER_IDENTITY AVP MSISDN=" + msisdn);
-                byte[] tbcd = parseTBCD(msisdn);
-                msisdn = toTBCDString(tbcd);
-                logger.info("TBCD MSISDN=" + msisdn);
+                    msisdnByteArray = udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.MSISDN).getOctetString();
+                msisdn = toTBCDString(msisdnByteArray);
                 if (udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.PUBLIC_IDENTITY) != null)
                     publicIdentity = udrAvpSet.getAvp(Avp.USER_IDENTITY).getGrouped().getAvp(Avp.PUBLIC_IDENTITY).getUTF8String();
-                logger.info("USER_IDENTITY AVP IMSPublicIdentity=" + publicIdentity);
             } catch (AvpDataException e) {
                 e.printStackTrace();
             } catch (Exception e) {

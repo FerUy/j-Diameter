@@ -108,8 +108,8 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
 
         if (rirAvpSet.getAvp(Avp.MSISDN) != null) {
             try {
-                byte[] msisdnArray = rirAvpSet.getAvp(Avp.MSISDN).getOctetString();
-                msisdn = toTBCDString(msisdnArray);
+                byte[] msisdnByteArray = rirAvpSet.getAvp(Avp.MSISDN).getOctetString();
+                msisdn = toTBCDString(msisdnByteArray);
             } catch (Exception e) {
                 e.printStackTrace();
             }
