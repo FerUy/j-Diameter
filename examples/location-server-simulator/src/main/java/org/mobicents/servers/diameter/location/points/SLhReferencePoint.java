@@ -217,8 +217,8 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         }
 
         if (resultCode == DIAMETER_ERROR_USER_UNKNOWN) {
-            logger.info("<> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
-                " (DIAMETER_ERROR_USER_UNKNOWN)");
+            logger.info(">> Sending [RIA] Routing-Info-Answer to " +rir.getOriginHost() + "@" +rir.getOriginRealm() + " with result code:" + resultCode +
+                " (DIAMETER_ERROR_USER_UNKNOWN)\n");
         }
         else if (resultCode == DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK) {
             riaAvpSet.removeAvp(Avp.RESULT_CODE);
@@ -227,18 +227,18 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
             experimentalResult.addAvp(Avp.EXPERIMENTAL_RESULT_CODE, DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK, true, true);
             experimentalResult.addAvp(Avp.VENDOR_ID, 10415, true, false);
 
-            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with experimental result code:" + resultCode +
-                " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)");
+            logger.info(">> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with experimental result code:" + resultCode +
+                " (DIAMETER_ERROR_UNAUTHORIZED_REQUESTING_NETWORK)\n");
         }
         else if (resultCode == DIAMETER_ERROR_ABSENT_USER) {
-            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
-                " (DIAMETER_ERROR_ABSENT_USER)");
+            logger.info(">> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+                " (DIAMETER_ERROR_ABSENT_USER)\n");
         }
         else if (resultCode == ResultCode.SUCCESS) {
-            logger.info("<> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
-                " (SUCCESS)");
+            logger.info(">> Sending [RIA] Routing-Info-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode +
+                " (SUCCESS)\n");
         } else {
-            logger.info("<> Sending Error-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode);
+            logger.info(">> Sending Error-Answer to " + rir.getOriginHost() + "@" + rir.getOriginRealm() + " with result code:" + resultCode + "\n");
         }
         session.sendLCSRoutingInfoAnswer(ria);
     }
