@@ -100,6 +100,7 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
 
         String msisdn = "";
         String publicIdentity = null;
+        boolean nullShUserData = false;
 
         if (logger.isInfoEnabled()) {
             try {
@@ -152,20 +153,36 @@ public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReq
                 resultCode = DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED;
             if (e.getMessage().equals("ApplicationUnsupported"))
                 resultCode = ResultCode.APPLICATION_UNSUPPORTED;
+            // Special case for sending null Sh-User-Data
+            if (e.getMessage().equals("ShUserDataUnsupported")) {
+                resultCode = ResultCode.SUCCESS;
+                nullShUserData = true;
+            }
         }
 
         UserDataAnswer uda = new UserDataAnswerImpl((Request) udr.getMessage(), resultCode);
         AvpSet udaAvpSet = uda.getMessage().getAvps();
 
         if (resultCode == ResultCode.SUCCESS) {
-            try {
-                udaAvpSet.addAvp(Avp.USER_DATA_SH, userData, 10415, true, false, true);
-                logger.info(">> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" +udr.getOriginRealm() + " with result code:" + resultCode +
-                    " (SUCCESS)\n");
-            } catch (AvpDataException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                logger.info(">< Error generating UDA] User-Data-Answer", e);
+            if (!nullShUserData) {
+                try {
+                    udaAvpSet.addAvp(Avp.USER_DATA_SH, userData, 10415, true, false, true);
+                    logger.info(">> Sending [UDA] User-Data-Answer to " + udr.getOriginHost() + "@" + udr.getOriginRealm() + " with result code:" + resultCode +
+                        " (SUCCESS)\n");
+                } catch (AvpDataException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.info(">< Error generating UDA] User-Data-Answer", e);
+                }
+            } else {
+                try {
+                    logger.info(">> Sending [UDA] User-Data-Answer with NULL to AVP Sh-Uder-Data to " + udr.getOriginHost() + "@" + udr.getOriginRealm() + " with result code:" + resultCode +
+                        " (SUCCESS)\n");
+                } catch (AvpDataException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.info(">< Error generating UDA] User-Data-Answer", e);
+                }
             }
         }
         else if (resultCode == DIAMETER_ERROR_USER_DATA_NOT_RECOGNIZED) {

@@ -83,6 +83,9 @@ public class SubscriberInformation {
         if (msisdn.equalsIgnoreCase("0")) {
             throw new Exception("ApplicationUnsupported");
         }
+        if (msisdn.equalsIgnoreCase("1234")) {
+            throw new Exception("ShUserDataUnsupported");
+        }
         try {
             String localSubscriberUserDataFile = System.getProperty("user.dir") + "/sh-user-data/" + msisdn + ".xml";
             File file = new File(localSubscriberUserDataFile);
