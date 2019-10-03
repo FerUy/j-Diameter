@@ -6,12 +6,12 @@
         <GeographicalInformation>EBu2ELlt9wA=</GeographicalInformation>
         <GeodeticInformation>AxCiJcdOOq8ZAQ==</GeodeticInformation>
         <VLRNumber>
-            <Address>57301897901234</Address>
+            <Address>NTk4OTc4OTM1==</Address>
         </VLRNumber>
         <MSCNumber>
-            <Address>573017901234</Address>
+            <Address>NTk4OTc4OTM0==</Address>
         </MSCNumber>
-        <CurrentLocationRetrieved>true</CurrentLocationRetrieved>
+        <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
         <AgeOfLocationInformation>0</AgeOfLocationInformation>
     </CSLocationInformation>
 </Sh-Data>

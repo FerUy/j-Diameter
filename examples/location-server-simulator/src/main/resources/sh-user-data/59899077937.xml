@@ -86,10 +86,10 @@
         <GeographicalInformation>EBu2ELlt9wA=</GeographicalInformation>
         <GeodeticInformation>AxCiJcdOOq8ZAQ==</GeodeticInformation>
         <VLRNumber>
-            <Address>59897901234</Address>
+            <Address>NTk4OTc4OTM1==</Address>
         </VLRNumber>
         <MSCNumber>
-            <Address>59897901234</Address>
+            <Address>NTk4OTc4OTM0==</Address>
         </MSCNumber>
         <CurrentLocationRetrieved>true</CurrentLocationRetrieved>
         <AgeOfLocationInformation>0</AgeOfLocationInformation>
@@ -114,8 +114,8 @@
                         <TrackingAreaId>NzIBOTU=</TrackingAreaId>
                         <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
                         <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
-                        <MMEName>mme742@u2.org</MMEName>
-                        <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
+                        <MMEName>mmec18.mmegi8001.mme.epc.mnc010.mcc732.3gppnetwork.org</MMEName>
+                        <CurrentLocationRetrieved>1</CurrentLocationRetrieved>
                         <AgeOfLocationInformation>1</AgeOfLocationInformation>
                         <UserCSGInformation>
                             <CSGId>ODE5MQ==</CSGId>
