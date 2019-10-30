@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Extension>
+        <Extension>
+            <Extension>
+                <Extension>
+                    <EPSUserState>4</EPSUserState>
+                    <EPSLocationInformation>
+                        <E-UTRANCellGlobalId>BfKRAk4nFQ==</E-UTRANCellGlobalId>
+                        <TrackingAreaId>BfKRAwY=</TrackingAreaId>
+                        <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+                        <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
+                        <MMEName>MMEC18.MMEGI8001.MME.EPC.MNC019.MCC502.3GPPNETWORK.ORG</MMEName>
+                        <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
+                        <AgeOfLocationInformation>0</AgeOfLocationInformation>
+                        <UserCSGInformation>
+                            <CSGId>ODE5MQ==</CSGId>
+                        </UserCSGInformation>
+                        <Extension>
+                            <VisitedPLMNID>951830</VisitedPLMNID>
+                            <LocalTimeZone>
+                                <TimeZone>-9</TimeZone>
+                                <DaylightSavingTime>0</DaylightSavingTime>
+                            </LocalTimeZone>
+                            <Extension>
+                                <RATtype>1004</RATtype>
+                            </Extension>
+                        </Extension>
+                    </EPSLocationInformation>
+                </Extension>
+            </Extension>
+        </Extension>
+    </Extension>
+</Sh-Data>

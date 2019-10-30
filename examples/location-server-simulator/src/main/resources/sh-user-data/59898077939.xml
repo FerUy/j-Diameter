@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <PSLocationInformation>
+        <CellGlobalId>NzIBAAFOSg==</CellGlobalId>
+        <RoutingAreaId>R/gQOTUy</RoutingAreaId>
+        <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+        <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
+        <SGSNNumber>
+            <Address>NTk4OTc4OTM2==</Address>
+        </SGSNNumber>
+        <CurrentLocationRetrieved>1</CurrentLocationRetrieved>
+        <AgeOfLocationInformation>5</AgeOfLocationInformation>
+        <Extension>
+            <UserCSGInformation>
+                <CSGId>ODE5MQ==</CSGId>
+            </UserCSGInformation>
+            <Extension>
+                <VisitedPLMNID>951820</VisitedPLMNID>
+                <LocalTimeZone>
+                    <TimeZone>+8</TimeZone>
+                    <DaylightSavingTime>1</DaylightSavingTime>
+                </LocalTimeZone>
+                <Extension>
+                    <RATtype>1001</RATtype>
+                </Extension>
+            </Extension>
+        </Extension>
+    </PSLocationInformation>
+</Sh-Data>

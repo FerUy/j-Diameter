@@ -2,7 +2,7 @@
 <Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <PublicIdentifiers>
         <IMSPublicIdentity>sip:john.doe@hp.com</IMSPublicIdentity>
-        <MSISDN>59899077937</MSISDN>
+        <MSISDN>59898077937</MSISDN>
         <Extension>
             <IdentityType>2</IdentityType>
             <WildcardedPSI>http://www.jainsleediameter.com</WildcardedPSI>
@@ -10,7 +10,7 @@
                 <WildcardedIMPU>http://www.jain-slee.diameter.com</WildcardedIMPU>
                 <Extension>
                     <ExtendedMSISDN>
-                        <MSISDN>59899077938</MSISDN>
+                        <MSISDN>59898077938</MSISDN>
                         <MSISDNType>1</MSISDNType>
                     </ExtendedMSISDN>
                     <Extension>
@@ -91,8 +91,23 @@
         <MSCNumber>
             <Address>NTk4OTc4OTM0==</Address>
         </MSCNumber>
-        <CurrentLocationRetrieved>true</CurrentLocationRetrieved>
+        <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
         <AgeOfLocationInformation>0</AgeOfLocationInformation>
+        <Extension>
+            <UserCSGInformation>
+                <CSGId>ODE5MQ==</CSGId>
+            </UserCSGInformation>
+            <Extension>
+                <E-UTRANCellGlobalId>BfKRAk4nFQ==</E-UTRANCellGlobalId>
+                <TrackingAreaId>BfKRAwY=</TrackingAreaId>
+                <Extension>
+                    <LocalTimeZone>
+                        <TimeZone>-5</TimeZone>
+                        <DaylightSavingTime>0</DaylightSavingTime>
+                    </LocalTimeZone>
+                </Extension>
+            </Extension>
+        </Extension>
     </CSLocationInformation>
     <PSLocationInformation>
         <CellGlobalId>NzIBAAFOSg==</CellGlobalId>
@@ -102,25 +117,73 @@
         <SGSNNumber>
             <Address>NTk4OTc4OTM2==</Address>
         </SGSNNumber>
-        <CurrentLocationRetrieved>false</CurrentLocationRetrieved>
-        <AgeOfLocationInformation>1</AgeOfLocationInformation>
+        <CurrentLocationRetrieved>1</CurrentLocationRetrieved>
+        <AgeOfLocationInformation>5</AgeOfLocationInformation>
+        <Extension>
+            <UserCSGInformation>
+                <CSGId>ODE5MQ==</CSGId>
+            </UserCSGInformation>
+            <Extension>
+                <VisitedPLMNID>951820</VisitedPLMNID>
+                <LocalTimeZone>
+                    <TimeZone>+1</TimeZone>
+                    <DaylightSavingTime>2</DaylightSavingTime>
+                </LocalTimeZone>
+                <Extension>
+                    <RATtype>1001</RATtype>
+                </Extension>
+            </Extension>
+        </Extension>
     </PSLocationInformation>
     <Extension>
         <Extension>
             <Extension>
                 <Extension>
+                    <EPSUserState>4</EPSUserState>
                     <EPSLocationInformation>
-                        <E-UTRANCellGlobalId>NzIBAAFOSg==</E-UTRANCellGlobalId>
-                        <TrackingAreaId>NzIBOTU=</TrackingAreaId>
+                        <E-UTRANCellGlobalId>BfKRAk4nFQ==</E-UTRANCellGlobalId>
+                        <TrackingAreaId>BfKRAwY=</TrackingAreaId>
                         <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
                         <GeodeticInformation>AxCiJcdOOq8ZAP==</GeodeticInformation>
-                        <MMEName>mmec18.mmegi8001.mme.epc.mnc010.mcc732.3gppnetwork.org</MMEName>
-                        <CurrentLocationRetrieved>1</CurrentLocationRetrieved>
-                        <AgeOfLocationInformation>1</AgeOfLocationInformation>
+                        <MMEName>MMEC18.MMEGI8001.MME.EPC.MNC019.MCC502.3GPPNETWORK.ORG</MMEName>
+                        <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
+                        <AgeOfLocationInformation>0</AgeOfLocationInformation>
                         <UserCSGInformation>
                             <CSGId>ODE5MQ==</CSGId>
                         </UserCSGInformation>
+                        <Extension>
+                            <VisitedPLMNID>951830</VisitedPLMNID>
+                            <LocalTimeZone>
+                                <TimeZone>-9</TimeZone>
+                                <DaylightSavingTime>0</DaylightSavingTime>
+                            </LocalTimeZone>
+                            <Extension>
+                                <RATtype>1004</RATtype>
+                            </Extension>
+                        </Extension>
                     </EPSLocationInformation>
+                    <Extension>
+                        <Extension>
+                            <Extension>
+                                <Sh-5GSLocationInformation>
+                                    <NRCellGlobalId>95180077395570</NRCellGlobalId>
+                                    <E-UTRANCellGlobalId>BfKRAk4nFQ==</E-UTRANCellGlobalId>
+                                    <TrackingAreaId>BfKRAwY=</TrackingAreaId>
+                                    <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+                                    <AMFAddress>amf1.cluster1.net2.amf.5gc.mnc012.mcc345.3gppnetwork.org</AMFAddress>
+                                    <SMSFAddress>smset12.smsf01.5gc.mnc012.mcc345.3gppnetwork.org</SMSFAddress>
+                                    <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
+                                    <AgeOfLocationInformation>0</AgeOfLocationInformation>
+                                    <VisitedPLMNID>951800</VisitedPLMNID>
+                                    <LocalTimeZone>
+                                        <TimeZone>-3</TimeZone>
+                                        <DaylightSavingTime>0</DaylightSavingTime>
+                                    </LocalTimeZone>
+                                    <RATtype>1006</RATtype>
+                                </Sh-5GSLocationInformation>
+                            </Extension>
+                        </Extension>
+                    </Extension>
                 </Extension>
             </Extension>
         </Extension>

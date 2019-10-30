@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sh-Data xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Extension>
+        <Extension>
+            <Extension>
+                <Extension>
+                    <Extension>
+                        <Extension>
+                            <Extension>
+                                <Sh-5GSLocationInformation>
+                                    <NRCellGlobalId>95180077395570</NRCellGlobalId>
+                                    <E-UTRANCellGlobalId>BfKRAk4nFQ==</E-UTRANCellGlobalId>
+                                    <TrackingAreaId>BfKRAwY=</TrackingAreaId>
+                                    <GeographicalInformation>EKEgAU402RI=</GeographicalInformation>
+                                    <AMFAddress>amf1.cluster1.net2.amf.5gc.mnc012.mcc345.3gppnetwork.org</AMFAddress>
+                                    <SMSFAddress>smset12.smsf01.5gc.mnc012.mcc345.3gppnetwork.org</SMSFAddress>
+                                    <CurrentLocationRetrieved>0</CurrentLocationRetrieved>
+                                    <AgeOfLocationInformation>0</AgeOfLocationInformation>
+                                    <VisitedPLMNID>951800</VisitedPLMNID>
+                                    <LocalTimeZone>
+                                        <TimeZone>-3</TimeZone>
+                                        <DaylightSavingTime>0</DaylightSavingTime>
+                                    </LocalTimeZone>
+                                    <RATtype>1006</RATtype>
+                                </Sh-5GSLocationInformation>
+                            </Extension>
+                        </Extension>
+                    </Extension>
+                </Extension>
+            </Extension>
+        </Extension>
+    </Extension>
+</Sh-Data>
