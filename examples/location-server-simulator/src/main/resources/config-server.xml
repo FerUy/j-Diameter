@@ -4,7 +4,7 @@
   <LocalPeer>
     <URI value="aaa://dra.simulator:23868" />
     <IPAddresses>
-      <IPAddress value="127.0.0.1" />
+      <IPAddress value="dra.simulator" />
     </IPAddresses>
     <Realm value="epc.mnc000.mcc000.3gppnetwork.org" />
     <VendorID value="10415" />
