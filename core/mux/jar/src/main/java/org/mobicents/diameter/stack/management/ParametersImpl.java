@@ -57,6 +57,7 @@ import static org.jdiameter.client.impl.helpers.Parameters.StatisticsLoggerDelay
 import static org.jdiameter.client.impl.helpers.Parameters.StatisticsLoggerPause;
 import static org.jdiameter.client.impl.helpers.Parameters.StopTimeOut;
 import static org.jdiameter.client.impl.helpers.Parameters.UseUriAsFqdn;
+import static org.jdiameter.client.impl.helpers.Parameters.SingleLocalPeer;
 import static org.jdiameter.server.impl.helpers.Parameters.AcceptUndefinedPeer;
 import static org.jdiameter.server.impl.helpers.Parameters.DuplicateProtection;
 import static org.jdiameter.server.impl.helpers.Parameters.DuplicateTimer;
@@ -82,6 +83,7 @@ public class ParametersImpl implements Parameters {
   private long duplicateTimer;
 
   private boolean useUriAsFqdn;
+  private boolean singleLocalPeer;
 
   private int queueSize;
 
@@ -109,6 +111,7 @@ public class ParametersImpl implements Parameters {
     this.duplicateProtection = config.getBooleanValue(DuplicateProtection.ordinal(), true);
     this.duplicateTimer = config.getLongValue(DuplicateTimer.ordinal(), 4 * 60 * 1000L);
     this.useUriAsFqdn = config.getBooleanValue(UseUriAsFqdn.ordinal(), false);
+    this.singleLocalPeer = config.getBooleanValue(SingleLocalPeer.ordinal(), true);
     this.queueSize = config.getIntValue(QueueSize.ordinal(), 10000);
 
     // Timeouts
@@ -171,6 +174,16 @@ public class ParametersImpl implements Parameters {
   @Override
   public void setUseUriAsFqdn(boolean useUriAsFqdn) {
     DiameterConfiguration.getMutableConfiguration().setBooleanValue(UseUriAsFqdn.ordinal(), useUriAsFqdn);
+  }
+
+  @Override
+  public boolean getSingleLocalPeer() {
+    return singleLocalPeer;
+  }
+
+  @Override
+  public void setSingleLocalPeer(boolean singleLocalPeer) {
+    DiameterConfiguration.getMutableConfiguration().setBooleanValue(SingleLocalPeer.ordinal(), singleLocalPeer);
   }
 
   @Override

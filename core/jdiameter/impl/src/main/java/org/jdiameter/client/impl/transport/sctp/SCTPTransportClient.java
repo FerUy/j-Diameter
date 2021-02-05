@@ -55,6 +55,7 @@ public class SCTPTransportClient {
   private String clientAssociationName;
   protected InetSocketAddress destAddress;
   protected InetSocketAddress origAddress;
+  protected String[] extraHostAddress;
   private int payloadProtocolId = 0;
   private int streamNumber = 0;
 
@@ -66,10 +67,8 @@ public class SCTPTransportClient {
   /**
    * Default constructor
    *
-   * @param concurrentFactory
-   *          factory for create threads
-   * @param parenConnection
-   *          connection created this transport
+   * @param concurrentFactory factory for create threads
+   * @param parenConnection   connection created this transport
    */
   SCTPTransportClient(SCTPClientConnection parenConnection) {
     this.parentConnection = parenConnection;
@@ -99,26 +98,23 @@ public class SCTPTransportClient {
         // Clear any saved connections, we will get them from jdiameter-config.xml
         this.management.removeAllResourses();
         logger.debug("Management initialized.");
-      }
-      else {
+      } else {
         logger.debug("Management already initialized.");
       }
 
       if (this.clientAssociation == null) {
-        logger.debug("Creating CLIENT ASSOCIATION '{}'. Origin Address [{}] <=> Dest Address [{}]", new Object[] {
-            clientAssociationName, origAddress, destAddress });
+        logger.debug("Creating CLIENT ASSOCIATION '{}'. Origin Address [{}] <=> Dest Address [{}]", new Object[]{
+            clientAssociationName, origAddress, destAddress});
         this.clientAssociation = this.management.addAssociation(origAddress.getAddress().getHostAddress(),
             origAddress.getPort(), destAddress.getAddress().getHostAddress(), destAddress.getPort(), clientAssociationName,
-            IpChannelType.SCTP, null);
-      }
-      else {
+            IpChannelType.SCTP, extraHostAddress);
+      } else {
         logger.debug("CLIENT ASSOCIATION '{}'. Origin Address [{}:{}] <=> Dest Address [{}:{}] already present. Re-using it.",
-            new Object[] { clientAssociation.getName(), clientAssociation.getHostAddress(), clientAssociation.getHostPort(),
-                clientAssociation.getPeerAddress(), clientAssociation.getPeerPort() });
+            new Object[]{clientAssociation.getName(), clientAssociation.getHostAddress(), clientAssociation.getHostPort(),
+                clientAssociation.getPeerAddress(), clientAssociation.getPeerPort()});
       }
 
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Failed to initialize client ", e);
     }
   }
@@ -133,8 +129,7 @@ public class SCTPTransportClient {
     try {
       this.clientAssociation.setAssociationListener(new ClientAssociationListener());
       this.management.startAssociation(clientAssociationName);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Failed to start client ", e);
     }
 
@@ -142,8 +137,8 @@ public class SCTPTransportClient {
       throw new NotInitializedException("No parent connection is set");
     }
 
-    logger.debug("Successfuly initialized SCTP Client Host [{}:{}] Peer [{}:{}]", new Object[] { clientAssociation.getHostAddress(),
-        clientAssociation.getHostPort(), clientAssociation.getPeerAddress(), clientAssociation.getPeerPort() });
+    logger.debug("Successfuly initialized SCTP Client Host [{}:{}] Peer [{}:{}]", new Object[]{clientAssociation.getHostAddress(),
+        clientAssociation.getHostPort(), clientAssociation.getPeerAddress(), clientAssociation.getPeerPort()});
     logger.debug("Client Association Status: Started[{}] Connected[{}] Up[{}] ",
         new Object[]{clientAssociation.isStarted(), clientAssociation.isConnected(), clientAssociation.isUp()});
     logger.trace("Client Association [{}]", clientAssociation);
@@ -155,8 +150,7 @@ public class SCTPTransportClient {
     while (clientAssociation.isStarted() && !clientAssociation.isConnected() && !clientAssociation.isUp()) {
       try {
         Thread.sleep(DELAY);
-      }
-      catch (InterruptedException e) {
+      } catch (InterruptedException e) {
         // clear flag and proceed
         Thread.interrupted();
         throw new IOException("Failed to establish SCTP connection, thread was interrupted waiting for connection.");
@@ -195,8 +189,7 @@ public class SCTPTransportClient {
       logger.debug("onCommunicationShutdown called for [{}]", this);
       try {
         getParent().onDisconnect();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         logger.debug("Error", e);
       }
     }
@@ -236,8 +229,7 @@ public class SCTPTransportClient {
       try {
         // make a message out of data and process it
         getParent().onMessageReceived(ByteBuffer.wrap(data));
-      }
-      catch (AvpDataException e) {
+      } catch (AvpDataException e) {
         logger.debug("Garbage was received. Discarding.");
         // storage.clear();
         getParent().onAvpDataException(e);
@@ -257,14 +249,19 @@ public class SCTPTransportClient {
 
   public void stop() throws Exception {
     // Stop the SCTP
-    this.management.stopAssociation(clientAssociationName);
+    if (this.management != null) {
+      this.management.stopAssociation(clientAssociationName);
+    }
   }
 
   public void release() throws Exception {
     this.stop();
-    this.management.removeAssociation(clientAssociationName);
-    this.management.stop();
+    if (this.management != null) {
+      this.management.removeAssociation(clientAssociationName);
+      this.management.stop();
+    }
     this.clientAssociation = null;
+    this.management = null;  // TODO - should we nullify management object? fair enough?
   }
 
   public InetSocketAddress getDestAddress() {
@@ -289,6 +286,14 @@ public class SCTPTransportClient {
     return this.origAddress;
   }
 
+  public String[] getExtraHostAddress() {
+    return extraHostAddress;
+  }
+
+  public void setExtraHostAddress(String[] extraHostAddress) {
+    this.extraHostAddress = extraHostAddress;
+  }
+
   public void sendMessage(ByteBuffer bytes) throws IOException {
     if (logger.isDebugEnabled()) {
       logger.debug("About to send a byte buffer of size [{}] over the SCTP", bytes.array().length);
@@ -298,8 +303,7 @@ public class SCTPTransportClient {
 
     try {
       this.clientAssociation.send(payloadData);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       logger.error("Failed sending byte buffer over SCTP", e);
     }
     if (logger.isDebugEnabled()) {

@@ -70,7 +70,7 @@ import org.jdiameter.common.api.concurrent.IConcurrentFactory;
 public class TransportLayerFactory implements ITransportLayerFactory {
 
   private Class<IConnection> connectionClass;
-  private Constructor<IConnection> constructorIAi, constructorIAiCL;
+  private Constructor<IConnection> constructorIAi, constructorIAiCL, constructorIAiCLEha;
   protected IMessageParser parser;
   protected Configuration config = null;
 
@@ -79,11 +79,10 @@ public class TransportLayerFactory implements ITransportLayerFactory {
     Configuration[] children = config.getChildren(Parameters.Extensions.ordinal());
 
     AppConfiguration internalExtensions = (AppConfiguration) children[ExtensionPoint.Internal.id()];
-    String implName = internalExtensions.getStringValue(
-        ExtensionPoint.InternalConnectionClass.ordinal(), ExtensionPoint.InternalConnectionClass.defValue()
-        );
+    String implName = internalExtensions.getStringValue(ExtensionPoint.InternalConnectionClass.ordinal(),
+        ExtensionPoint.InternalConnectionClass.defValue());
     try {
-      //TODO: this should be enough to check if class has interface!?
+      // TODO: this should be enough to check if class has interface!?
       this.connectionClass = (Class<IConnection>) forName(implName);
 
       if (!IConnection.class.isAssignableFrom(this.connectionClass)) {
@@ -94,22 +93,24 @@ public class TransportLayerFactory implements ITransportLayerFactory {
     }
     try {
       //TODO: this is bad practice, IConnection is interface and this code enforces constructor type to be present!
+      constructorIAiCLEha = connectionClass.getConstructor(
+          Configuration.class, IConcurrentFactory.class, InetAddress.class, Integer.TYPE, InetAddress.class,
+          Integer.TYPE, String[].class, String.class, IConnectionListener.class, IMessageParser.class, String.class);
       constructorIAiCL = connectionClass.getConstructor(
           Configuration.class, IConcurrentFactory.class, InetAddress.class, Integer.TYPE, InetAddress.class,
           Integer.TYPE, IConnectionListener.class, IMessageParser.class, String.class);
       constructorIAi = connectionClass.getConstructor(
           Configuration.class, IConcurrentFactory.class, InetAddress.class, Integer.TYPE, InetAddress.class,
           Integer.TYPE, IMessageParser.class, String.class);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransportException("Cannot find required constructor", TransportError.Internal, e);
     }
     this.parser = parser;
   }
 
   @Override
-  public IConnection createConnection(InetAddress remoteAddress, IConcurrentFactory factory, int remotePort, InetAddress localAddress, int localPort,
-      String ref) throws TransportException {
+  public IConnection createConnection(InetAddress remoteAddress, IConcurrentFactory factory, int remotePort,
+                                      InetAddress localAddress, int localPort, String ref) throws TransportException {
     try {
       factory = factory == null ? new DummyConcurrentFactory() : factory;
       return constructorIAi.newInstance(config, factory, remoteAddress, remotePort, localAddress, localPort, parser, ref);
@@ -119,11 +120,24 @@ public class TransportLayerFactory implements ITransportLayerFactory {
   }
 
   @Override
-  public IConnection createConnection(InetAddress remoteAddress, IConcurrentFactory factory, int remotePort, InetAddress localAddress, int localPort,
-      IConnectionListener listener, String ref) throws TransportException {
+  public IConnection createConnection(InetAddress remoteAddress, IConcurrentFactory factory, int remotePort, InetAddress localAddress,
+                                      int localPort, IConnectionListener listener, String ref) throws TransportException {
     try {
       factory = factory == null ? new DummyConcurrentFactory() : factory;
       return constructorIAiCL.newInstance(config, factory, remoteAddress, remotePort, localAddress, localPort, listener, parser, ref);
+    } catch (Exception e) {
+      throw new TransportException("Cannot create an instance of " + connectionClass, TransportError.Internal, e);
+    }
+  }
+
+  @Override
+  public IConnection createConnection(InetAddress remoteAddress, IConcurrentFactory factory, int remotePort, InetAddress localAddress,
+                                      int localPort, String[] extraHostAddresses, String standbyRemoteAddresses,
+                                      IConnectionListener listener, String ref) throws TransportException {
+    try {
+      factory = factory == null ? new DummyConcurrentFactory() : factory;
+      return constructorIAiCLEha.newInstance(config, factory, remoteAddress, remotePort, localAddress, localPort,
+          extraHostAddresses, standbyRemoteAddresses, listener, parser, ref);
     } catch (Exception e) {
       throw new TransportException("Cannot create an instance of " + connectionClass, TransportError.Internal, e);
     }

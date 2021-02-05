@@ -139,6 +139,11 @@ public class Parameters extends Ordinal {
   public static final Parameters UseUriAsFqdn = new Parameters("UseUriAsFqdn", Boolean.class, false);
 
   /**
+   * Server is bound as multihomed addresses from
+   */
+  public static final Parameters SingleLocalPeer = new Parameters("SingleLocalPeer", Boolean.class, false);
+
+  /**
    * Peer name property
    */
   public static final Parameters PeerName = new Parameters("PeerName", String.class, "");
@@ -149,9 +154,19 @@ public class Parameters extends Ordinal {
   public static final Parameters PeerIp = new Parameters("PeerIp", String.class, "");
 
   /**
+   * Peer host property
+   */
+  public static final Parameters PeerHost = new Parameters("PeerHost", String.class, "");
+
+  /**
    * Peer local peer port range (format: 1345-1346) property
    */
   public static final Parameters PeerLocalPortRange = new Parameters("PeerLocalPortRange", String.class, "");
+
+  /**
+   * Peer remote standby address list
+   */
+  public static final Parameters PeerStandbyAddresses = new Parameters("PeerStandbyAddresses", String.class, "");
 
   /**
    * Peer rating property

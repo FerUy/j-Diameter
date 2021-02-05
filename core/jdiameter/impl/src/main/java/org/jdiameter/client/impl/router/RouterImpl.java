@@ -398,6 +398,11 @@ public class RouterImpl implements IRouter {
       destRealm = avpRealm.getDiameterIdentity();
 
       Avp avpHost = message.getAvps().getAvp(Avp.DESTINATION_HOST);
+      Avp forwardingHost = message.getAvps().getAvp(999);
+      if(forwardingHost != null) {
+        avpHost = forwardingHost;
+        message.getAvps().removeAvp(999);
+      }
       if (avpHost != null) {
         destHost = avpHost.getDiameterIdentity();
       }

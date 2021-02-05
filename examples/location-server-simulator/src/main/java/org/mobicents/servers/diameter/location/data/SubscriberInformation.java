@@ -1,7 +1,6 @@
 package org.mobicents.servers.diameter.location.data;
 
 import com.google.gson.Gson;
-import org.mobicents.servers.diameter.location.LocationServerSimulator;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -19,7 +18,7 @@ import java.util.ArrayList;
  */
 public class SubscriberInformation {
 
-    private static final Logger logger = LoggerFactory.getLogger(LocationServerSimulator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubscriberInformation.class);
     private static String subscriberLocationDataFilename = "subscriber-location-data.json";
 
     public ArrayList<SubscriberElement> subscribers = new ArrayList<SubscriberElement>();

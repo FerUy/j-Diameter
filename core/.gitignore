@@ -1,0 +1,192 @@
+
+##############################
+## Java
+##############################
+.mtj.tmp/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+##############################
+## Maven
+##############################
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+pom.xml.bak
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+# ignore mvn-rpmbuild repo
+/.m2
+
+##############################
+## Gradle
+##############################
+bin/
+build/
+.gradle
+.gradletasknamecache
+gradle-app.setting
+!gradle-wrapper.jar
+
+##############################
+## IntelliJ
+##############################
+out/
+.idea/
+.idea_modules/
+*.iml
+*.ipr
+*.iws
+.idea
+
+##############################
+## Eclipse
+##############################
+.settings/
+bin/
+tmp/
+.eclipse
+.metadata
+.classpath
+.project
+.settings
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.factorypath
+
+##############################
+## NetBeans
+##############################
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+catalog.xml
+nbactions.xml
+nb-configuration.xml
+
+##############################
+## Visual Studio Code
+##############################
+.vscode/
+
+##############################
+## OS generated files
+##############################
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+
+# location simulator config server #
+examples/location-server-simulator/config-server.xml
+
+# ignore .svn metadata files #
+.svn
+
+# Ant 
+maven-ant-tasks.jar
+test-output
+transaction.log
+
+# vim files
+*.swp
+/.gitk-tmp.*
+atlassian-ide-plugin.xml
+
+# temp files
+*~
+testsuite/performance/.gitignore
+
+# hprof dumps
+/*.hprof
+
+# ignore 'randomly' strewn around logs
+server.log
+
+# H2 databases produced by tests
+*.h2.db
+
+###################################
+# JBoss transaction generated files
+###################################
+PutObjectStoreDirHere
+*debuglog.txt
+${env.JBOSS_HOME}
+\$\{env.JBOSS_HOME\}
+debuglog.txt.*
+testsuite/core/
+*.logs
+
+
+##############################
+## Generated directories
+##############################
+antlr/
+avalon-framework/
+bcel/
+biz/
+ch/
+logs/
+LICENSE4J-Runtime-Library/
+asm/
+backport-util-concurrent/
+classworlds/
+commons-beanutils/
+commons-chain/    
+commons-codec/
+commons-cli/
+commons-collections/
+commons-digester/
+commons-io/
+commons-lang/
+commons-logging/
+commons-pool/
+commons-validator/
+commons-chain/    
+commons-codec/
+commons-pool/
+dom4j/
+io/
+javassist/
+javax/
+javolution/
+jboss/  
+jgroups/
+joda-time/
+junit/
+log4j/
+logkit/
+net/
+oro/
+oswego-concurrent/
+qdox/
+regexp/
+sslext/
+stax/
+sun-jaxb/
+trove/
+wutka-dtdparser/
+xalan/
+xerces/
+xml-apis/
+xmlpull/
+xpp3/

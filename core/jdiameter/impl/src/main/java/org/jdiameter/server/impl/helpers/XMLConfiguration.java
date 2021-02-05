@@ -91,10 +91,12 @@ import static org.jdiameter.client.impl.helpers.Parameters.OwnProductName;
 import static org.jdiameter.client.impl.helpers.Parameters.OwnRealm;
 import static org.jdiameter.client.impl.helpers.Parameters.OwnVendorID;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerFSMThreadCount;
+import static org.jdiameter.client.impl.helpers.Parameters.PeerHost;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerIp;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerLocalPortRange;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerName;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerRating;
+import static org.jdiameter.client.impl.helpers.Parameters.PeerStandbyAddresses;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerTable;
 import static org.jdiameter.client.impl.helpers.Parameters.Properties;
 import static org.jdiameter.client.impl.helpers.Parameters.PropertyName;
@@ -110,6 +112,7 @@ import static org.jdiameter.client.impl.helpers.Parameters.SDUseClientMode;
 import static org.jdiameter.client.impl.helpers.Parameters.Security;
 import static org.jdiameter.client.impl.helpers.Parameters.SecurityRef;
 import static org.jdiameter.client.impl.helpers.Parameters.SessionTimeOut;
+import static org.jdiameter.client.impl.helpers.Parameters.SingleLocalPeer;
 import static org.jdiameter.client.impl.helpers.Parameters.Statistics;
 import static org.jdiameter.client.impl.helpers.Parameters.StatisticsActiveList;
 import static org.jdiameter.client.impl.helpers.Parameters.StatisticsEnabled;
@@ -340,6 +343,9 @@ public class XMLConfiguration extends EmptyConfiguration {
       String nodeName = c.item(i).getNodeName();
       if (nodeName.equals("UseUriAsFqdn")) {
         add(UseUriAsFqdn, Boolean.valueOf(getValue(c.item(i))));
+      }
+      else if (nodeName.equals("SingleLocalPeer")) {
+        add(SingleLocalPeer, Boolean.valueOf(getValue(c.item(i))));
       }
       else if (nodeName.equals("QueueSize")) {
         add(QueueSize, getIntValue(c.item(i)));
@@ -605,8 +611,14 @@ public class XMLConfiguration extends EmptyConfiguration {
     if (node.getAttributes().getNamedItem("ip") != null) {
       c.add(PeerIp, node.getAttributes().getNamedItem("ip").getNodeValue());
     }
+    if (node.getAttributes().getNamedItem("host") != null) {
+      c.add(PeerHost, node.getAttributes().getNamedItem("host").getNodeValue());
+    }
     if (node.getAttributes().getNamedItem("portRange") != null) {
       c.add(PeerLocalPortRange, node.getAttributes().getNamedItem("portRange").getNodeValue());
+    }
+    if (node.getAttributes().getNamedItem("standby_addresses") != null) {
+      c.add(PeerStandbyAddresses, node.getAttributes().getNamedItem("standby_addresses").getNodeValue());
     }
     if (node.getAttributes().getNamedItem("security_ref") != null) {
       c.add(SecurityRef, node.getAttributes().getNamedItem("security_ref").getNodeValue());

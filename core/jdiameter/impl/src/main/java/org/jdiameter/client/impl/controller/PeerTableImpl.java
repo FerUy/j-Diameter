@@ -229,6 +229,7 @@ public class PeerTableImpl implements IPeerTable {
       }
       else {
         logger.debug("Message was submitted to be sent, now adding statistics");
+        logger.info(String.format("Message '%s', sessionId '%s' submitted!", message.isRequest() ? "request" : "answer", message.getSessionId()));
         if (message.isRequest()) {
           if (peer.getStatistic().isEnabled()) {
             peer.getStatistic().getRecordByName(IStatisticRecord.Counters.AppGenRequest.name()).inc();

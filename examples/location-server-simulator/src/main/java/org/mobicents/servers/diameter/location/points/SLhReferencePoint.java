@@ -13,12 +13,9 @@ import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Request;
 import org.jdiameter.api.ResultCode;
 import org.jdiameter.api.RouteException;
-import org.jdiameter.api.app.AppAnswerEvent;
 import org.jdiameter.api.slh.ServerSLhSession;
 import org.jdiameter.api.slh.events.LCSRoutingInfoAnswer;
 import org.jdiameter.api.slh.events.LCSRoutingInfoRequest;
-import org.jdiameter.common.api.app.auth.ClientAuthSessionState;
-import org.jdiameter.common.impl.app.AppAnswerEventImpl;
 import org.jdiameter.common.impl.app.slh.LCSRoutingInfoAnswerImpl;
 import org.jdiameter.common.impl.app.slh.SLhSessionFactoryImpl;
 import org.jdiameter.server.impl.app.slh.SLhServerSessionImpl;
@@ -166,7 +163,7 @@ public class SLhReferencePoint extends SLhSessionFactoryImpl implements NetworkR
         if (resultCode == ResultCode.SUCCESS) {
 
             riaAvpSet.addAvp(Avp.USER_NAME, subscriberElement.imsi, 10415, true, false, false);
-            riaAvpSet.addAvp(Avp.MSISDN, subscriberElement.msisdn, 10415, true, false, true);
+            riaAvpSet.addAvp(Avp.MSISDN, parseTBCD(subscriberElement.msisdn), 10415, true, false);
             // Local Mobile Station Identity (LMSI) allocated by the VLR (MCC[3] + MNC[2|3] + MSIN max 15 digits)
             riaAvpSet.addAvp(Avp.LMSI, subscriberElement.lmsi, 10415, true, false, true);
 
