@@ -25,7 +25,10 @@ package org.jdiameter.client.impl.transport.sctp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -46,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
  * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
  */
@@ -63,6 +65,15 @@ public class SCTPClientConnection implements IConnection {
   // Cached value for connection key
   private String cachedKey = null;
 
+  // active/stand-by
+  private int remotePort;
+  private int localPort;
+
+  private List<ConnectionTuple> multiConnectionTuples = new ArrayList<>();
+  private int currentConnectionTuple = -1;
+
+  private boolean transportClientStarted;
+
   protected SCTPClientConnection(IMessageParser parser) {
     this.createdTime = System.currentTimeMillis();
     this.parser = parser;
@@ -70,24 +81,72 @@ public class SCTPClientConnection implements IConnection {
   }
 
   public SCTPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
-      int remotePort, InetAddress localAddress, int localPort, IMessageParser parser, String ref) {
+                              int remotePort, InetAddress localAddress, int localPort, IMessageParser parser, String ref) {
     this(parser);
 
-    logger.debug("SCTP Client constructor. Remote [{}:{}] Local [{}:{}]", new Object[] { remoteAddress, remotePort,
-        localAddress, localPort });
+    logger.debug("SCTP Client constructor. Remote [{}:{}] Local [{}:{}]", new Object[]{remoteAddress, remotePort,
+        localAddress, localPort});
     client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
+    this.remotePort = remotePort;
     client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+    this.localPort = localPort;
   }
 
   public SCTPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
-      int remotePort, InetAddress localAddress, int localPort, IConnectionListener listener, IMessageParser parser, String ref) {
+                              int remotePort, InetAddress localAddress, int localPort, IConnectionListener listener,
+                              IMessageParser parser, String ref) {
     this(parser);
-
-    logger.debug("SCTP Client constructor (with ref). Remote [{}:{}] Local [{}:{}]", new Object[] { remoteAddress, remotePort,
-        localAddress, localPort });
+    logger.debug("SCTP Client constructor (with ref). Remote [{}:{}] Local [{}:{}]",
+        new Object[]{remoteAddress, remotePort, localAddress, localPort});
     client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
+    this.remotePort = remotePort;
     client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+    this.localPort = localPort;
     listeners.add(listener);
+  }
+
+  public SCTPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
+                              int remotePort, InetAddress localAddress, int localPort, String[] extraHostAddresses,
+                              String standbyAddresses, IConnectionListener listener, IMessageParser parser, String ref) {
+    this(parser);
+    logger.debug("SCTP Client constructor (with ref). Remote [{}:{}] Local [{}:{}] (with extra host addresses)",
+        new Object[]{remoteAddress, remotePort, localAddress, localPort});
+    //client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
+    this.remotePort = remotePort;
+    //client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+    this.localPort = localPort;
+    //client.setExtraHostAddress(extraHostAddresses);
+    listeners.add(listener);
+
+    multiConnectionTuples.add(new ConnectionTuple(localAddress, remoteAddress));
+    currentConnectionTuple = 0;
+
+    if (standbyAddresses != null && standbyAddresses.length() > 0) {
+      String[] standbyAddressesList = standbyAddresses.split(",");
+      int extraHostAddressIndex = 0;
+      for (int i = 0; i < standbyAddressesList.length; i++) {
+        try {
+          InetAddress standbyLocalAddress = (extraHostAddresses != null && extraHostAddresses.length > 0) ?
+              InetAddress.getByName(extraHostAddresses[extraHostAddressIndex]) : localAddress;
+          InetAddress standbyRemoteAddress = InetAddress.getByName(standbyAddressesList[i]);
+          multiConnectionTuples.add(new ConnectionTuple(standbyLocalAddress, standbyRemoteAddress));
+          logger.debug("SCTP Client constructor (with ref). Remote [{}:{}] Local [{}:{}] (standby connection added)",
+              new Object[]{standbyAddressesList[i], remotePort, extraHostAddresses[extraHostAddressIndex], localPort});
+          if (extraHostAddresses != null && extraHostAddresses.length > 0) {
+            if (extraHostAddressIndex++ == extraHostAddresses.length) {
+              break;
+            }
+          }
+        } catch (UnknownHostException e) {
+          logger.error("SCTP Client constructor (with ref). Remote [{}:{}] Local [{}:{}] (error adding standby connection)",
+              new Object[]{
+                  standbyAddressesList[i],
+                  remotePort,
+                  extraHostAddresses.length > 0 ? extraHostAddresses[extraHostAddressIndex] : localAddress.getHostAddress(),
+                  localPort});
+        }
+      }
+    }
   }
 
   @Override
@@ -98,13 +157,53 @@ public class SCTPClientConnection implements IConnection {
   @Override
   public void connect() throws TransportException {
     try {
+      if (currentConnectionTuple != -1) {
+        if (transportClientStarted) {
+          logger.debug("SCTP is releasing previously initialized association for local '{}:{}' and remote '{}:{}'",
+              getClient().getOrigAddress().getAddress(), getClient().getOrigAddress().getPort(),
+              getClient().getDestAddress().getAddress(), getClient().getDestAddress().getPort());
+          try {
+            getClient().release();
+          } catch (Exception e) {
+            logger.error("Caught exception while releasing the previous association", e);
+          }
+        }
+
+        InetAddress localAddress = multiConnectionTuples.get(currentConnectionTuple).getLocalAddress();
+        String[] extraHostAddresses = new String[multiConnectionTuples.size() - 1];
+        int extraHostAddressIndex = 0;
+        for(ConnectionTuple tuple : multiConnectionTuples) {
+          if (!tuple.getLocalAddress().equals(localAddress)) {
+            extraHostAddresses[extraHostAddressIndex++] = tuple.getLocalAddress().getHostAddress();
+          }
+        }
+
+        // stop & release previous association if there before
+        if (multiConnectionTuples.size() > 1) {
+          getClient().stop();
+          getClient().release();
+        }
+
+        logger.debug("Client connection [index {}, nodes {}] local '{}:{}' and remote '{}:{}', extra hosts '{}'",
+            currentConnectionTuple, multiConnectionTuples.size(), localAddress, localPort,
+            multiConnectionTuples.get(currentConnectionTuple).getRemoteAddress(), remotePort,
+            extraHostAddresses);
+        getClient().setDestAddress(new InetSocketAddress(multiConnectionTuples.get(currentConnectionTuple).getRemoteAddress(),
+            remotePort));
+        getClient().setOrigAddress(new InetSocketAddress(multiConnectionTuples.get(currentConnectionTuple).getLocalAddress(),
+            localPort));
+        getClient().setExtraHostAddress(extraHostAddresses);
+
+        currentConnectionTuple = (currentConnectionTuple + 1) % multiConnectionTuples.size();
+      }
+
       getClient().initialize();
       getClient().start();
-    }
-    catch (IOException e) {
+
+      transportClientStarted = true;
+    } catch (IOException e) {
       throw new TransportException("Cannot init transport: ", TransportError.NetWorkError, e);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransportException("Cannot init transport: ", TransportError.Internal, e);
     }
   }
@@ -115,8 +214,7 @@ public class SCTPClientConnection implements IConnection {
       if (getClient() != null) {
         getClient().stop();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new InternalError("Error while stopping transport: " + e.getMessage());
     }
   }
@@ -127,11 +225,9 @@ public class SCTPClientConnection implements IConnection {
       if (getClient() != null) {
         getClient().release();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new IOException(e.getMessage());
-    }
-    finally {
+    } finally {
       parser = null;
       buffer.clear();
       remAllConnectionListener();
@@ -144,8 +240,7 @@ public class SCTPClientConnection implements IConnection {
       if (getClient() != null) {
         getClient().sendMessage(parser.encodeMessage(message));
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransportException("Cannot send message: ", TransportError.FailedSendMessage, e);
     }
   }
@@ -183,15 +278,13 @@ public class SCTPClientConnection implements IConnection {
         for (Event e : buffer) {
           try {
             onEvent(e);
-          }
-          catch (AvpDataException e1) {
+          } catch (AvpDataException e1) {
             // ignore
           }
         }
         buffer.clear();
       }
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -201,8 +294,7 @@ public class SCTPClientConnection implements IConnection {
     lock.lock();
     try {
       listeners.clear();
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -212,8 +304,7 @@ public class SCTPClientConnection implements IConnection {
     lock.lock();
     try {
       listeners.remove(listener);
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -252,8 +343,7 @@ public class SCTPClientConnection implements IConnection {
   protected void onAvpDataException(AvpDataException e) {
     try {
       onEvent(new Event(EventType.DATA_EXCEPTION, e));
-    }
-    catch (AvpDataException e1) {
+    } catch (AvpDataException e1) {
       // ignore
     }
   }
@@ -261,8 +351,7 @@ public class SCTPClientConnection implements IConnection {
   protected void onConnected() {
     try {
       onEvent(new Event(EventType.CONNECTED));
-    }
-    catch (AvpDataException e1) {
+    } catch (AvpDataException e1) {
       // ignore
     }
   }
@@ -289,8 +378,7 @@ public class SCTPClientConnection implements IConnection {
           }
         }
       }
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -299,16 +387,14 @@ public class SCTPClientConnection implements IConnection {
     if (listeners.size() == 0) {
       try {
         buffer.add(event);
-      }
-      catch (IllegalStateException e) {
+      } catch (IllegalStateException e) {
         // FIXME : requires JDK6 : buffer.removeLast();
         Event[] tempBuffer = buffer.toArray(new Event[buffer.size()]);
         buffer.remove(tempBuffer[tempBuffer.length - 1]);
         buffer.add(event);
       }
       return false;
-    }
-    else {
+    } else {
       return true;
     }
   }
@@ -324,10 +410,6 @@ public class SCTPClientConnection implements IConnection {
     ByteBuffer message;
     Exception exception;
 
-    Event(EventType type) {
-      this.type = type;
-    }
-
     Event(EventType type, Exception exception) {
       this(type);
       this.exception = exception;
@@ -336,6 +418,29 @@ public class SCTPClientConnection implements IConnection {
     Event(EventType type, ByteBuffer message) {
       this(type);
       this.message = message;
+    }
+
+    Event(EventType type) {
+      this.type = type;
+    }
+  }
+
+  class ConnectionTuple {
+
+    private InetAddress remoteAddress;
+    private InetAddress localAddress;
+
+    ConnectionTuple(InetAddress localAddress, InetAddress remoteAddress) {
+      this.remoteAddress = remoteAddress;
+      this.localAddress = localAddress;
+    }
+
+    public InetAddress getLocalAddress() {
+      return localAddress;
+    }
+
+    public InetAddress getRemoteAddress() {
+      return remoteAddress;
     }
   }
 }

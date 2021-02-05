@@ -57,6 +57,7 @@ public class SCTPTransportServer {
   private static final Logger logger = LoggerFactory.getLogger(SCTPTransportServer.class);
   private int payloadProtocolId = 0;
   private int streamNumber = 0;
+  private String[] extraHostAddress = null;
 
   public SCTPTransportServer() {
   }
@@ -116,8 +117,7 @@ public class SCTPTransportServer {
       // key1.attach(((Association) remoteClientAssociation));
 
       logger.info(String.format("Connected to {}", remoteClientAssociation));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       // ammendonca: this is managed, no need to do it manually now.
       // try {
       //   socketChannel.close();
@@ -161,7 +161,7 @@ public class SCTPTransportServer {
       // We don't have any, let's create it
       if (server == null) {
         server = this.management.addServer(serverName, origAddress.getAddress().getHostAddress(), origAddress.getPort(),
-            IpChannelType.SCTP, true, 10, null);
+            IpChannelType.SCTP, true, 10, extraHostAddress);
       }
 
       for (String assocName : server.getAssociations()) {
@@ -199,6 +199,10 @@ public class SCTPTransportServer {
     logger.debug("Server Association Status: Started[{}] Connected[{}] Up[{}] ",
         new Object[]{serverAssociation.isStarted(), serverAssociation.isConnected(), serverAssociation.isUp()});
     logger.trace("Server Association [{}]", serverAssociation);
+  }
+
+  public void setExtraHostAddress(String[] extraHostAddress) {
+    this.extraHostAddress = extraHostAddress;
   }
 
   private class ServerAssociationListener implements AssociationListener {

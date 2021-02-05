@@ -80,6 +80,27 @@ public class SCTPServerConnection implements IConnection {
     server.startServer();
   }
 
+  public SCTPServerConnection(Configuration config, InetAddress localAddress, int localPort, IMessageParser parser, String ref,
+                              NetworkGuard guard, boolean useExtraHostAddress) throws Exception {
+    this(parser, guard);
+
+    logger.debug("SCTP Server constructor for listening server @ {}:{}", localAddress, localPort);
+    server.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+
+    if (useExtraHostAddress && guard.localAddresses != null && guard.localAddresses.length > 1) {
+      String[] extraHostAddress = new String[guard.localAddresses.length - 1];
+      int i = 0;
+      for (InetAddress ia : guard.localAddresses) {
+        if (!ia.equals(localAddress)) {
+          extraHostAddress[i++] = ia.getHostAddress();
+        }
+      }
+      server.setExtraHostAddress(extraHostAddress);
+    }
+
+    server.startServer();
+  }
+
   // this creates the remote client connection
   public SCTPServerConnection(Configuration config, InetAddress remoteAddress, int remotePort, InetAddress localAddress,
       int localPort, IMessageParser parser, String ref, NetworkGuard guard, Server globalServer, Association association,

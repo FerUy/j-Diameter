@@ -422,6 +422,18 @@ public class MutablePeerTableImpl extends PeerTableImpl implements IMutablePeerT
                 @SuppressWarnings("unchecked")
                 public void connectionClosed(String connKey, List notSended) {
                   logger.debug("Connection [{}] closed", connKey);
+                  try {
+                    String host = connKey.substring(6).split(":")[0];   // string having the format "aaa://12.12.12.12:5860"
+                    IPeer peer = (IPeer) peerTable.get(host);
+                    if (peer != null) {
+                      logger.warn("Connection [{}] closed! current key [{}] peer state [{}]", connKey, connection.getKey(), peer.getState(PeerState.class));
+                    } else {
+                      logger.error("Connection [{}] closed! current key [{}] no peer info!", connKey, connection.getKey());
+                    }
+                  } catch(Exception e) {
+                    logger.error(String.format("Captured exception while in getting peer info for connKey [{}] with local value [{}]",
+                        connKey, connection.getKey()), e);
+                  }
                   unregister(true);
                 }
 

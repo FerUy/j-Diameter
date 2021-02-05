@@ -96,7 +96,7 @@ public class TCPClientConnection implements IConnection {
   }
 
   public TCPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, Socket socket,
-      IMessageParser parser, String ref) throws Exception {
+                             IMessageParser parser, String ref) throws Exception {
     this(concurrentFactory, parser);
     client = new TCPTransportClient(concurrentFactory, this);
     client.initialize(socket);
@@ -104,18 +104,34 @@ public class TCPClientConnection implements IConnection {
   }
 
   public TCPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
-      int remotePort, InetAddress localAddress, int localPort, IMessageParser parser, String ref) {
+                             int remotePort, InetAddress localAddress, int localPort, IMessageParser parser, String ref) {
     this(concurrentFactory, parser);
     client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
     client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
   }
 
   public TCPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
-      int remotePort, InetAddress localAddress, int localPort, IConnectionListener listener,
-      IMessageParser parser, String ref) {
+                             int remotePort, InetAddress localAddress, int localPort, IConnectionListener listener,
+                             IMessageParser parser, String ref) {
     this(concurrentFactory, parser);
     client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
     client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+    listeners.add(listener);
+  }
+
+  public TCPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
+                             int remotePort, InetAddress localAddress, int localPort, String[] extraHostAddresses,
+                             String standbyRemoteAddresses, IConnectionListener listener, IMessageParser parser,
+                             String ref) {
+    this(concurrentFactory, parser);
+    client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
+    client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+    if (extraHostAddresses != null && extraHostAddresses.length > 0) {
+      logger.warn("ExtraHostAddresses[{}] can't be bound to local server using TCP.", extraHostAddresses.length);
+    }
+    if (standbyRemoteAddresses != null && standbyRemoteAddresses.length() > 0) {
+      logger.warn("Secondary/stand-by remote connection [{}] not yet implemented over TCP.", standbyRemoteAddresses);
+    }
     listeners.add(listener);
   }
 
@@ -129,11 +145,9 @@ public class TCPClientConnection implements IConnection {
     try {
       getClient().initialize();
       getClient().start();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       throw new TransportException("Cannot init transport: ", TransportError.NetWorkError, e);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransportException("Cannot init transport: ", TransportError.Internal, e);
     }
   }
@@ -146,8 +160,7 @@ public class TCPClientConnection implements IConnection {
       if (getClient() != null) {
         getClient().stop();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new InternalError("Error while stopping transport: " + e.getMessage());
     }
   }
@@ -160,11 +173,9 @@ public class TCPClientConnection implements IConnection {
       if (getClient() != null) {
         getClient().release();
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new IOException(e.getMessage());
-    }
-    finally {
+    } finally {
       parser = null;
       buffer.clear();
       remAllConnectionListener();
@@ -192,8 +203,7 @@ public class TCPClientConnection implements IConnection {
         //  }
         //}
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransportException("Cannot send message: ", TransportError.FailedSendMessage, e);
     }
   }
@@ -233,15 +243,13 @@ public class TCPClientConnection implements IConnection {
             //PCB added logging
             logger.debug("Processing event from buffer");
             onEvent(e);
-          }
-          catch (AvpDataException e1) {
+          } catch (AvpDataException e1) {
             // ignore
           }
         }
         buffer.clear();
       }
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -255,8 +263,7 @@ public class TCPClientConnection implements IConnection {
       //PCB added logging
       logger.debug("Removing all listeners on [{}]", this.getKey());
       listeners.clear();
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -268,8 +275,7 @@ public class TCPClientConnection implements IConnection {
       //PCB added logging
       logger.debug("Removing listener [{}] on [{}]", listener.getClass().getName(), this.getKey());
       listeners.remove(listener);
-    }
-    finally {
+    } finally {
       lock.unlock();
     }
   }
@@ -301,9 +307,8 @@ public class TCPClientConnection implements IConnection {
     if (logger.isDebugEnabled()) {
       if (logger.isTraceEnabled()) {
         String hex = MessageParser.byteArrayToHexString(message.array());
-        logger.trace("Received message of size [{}]\n{}", new Object[] { message.array().length, hex });
-      }
-      else {
+        logger.trace("Received message of size [{}]\n{}", new Object[]{message.array().length, hex});
+      } else {
         logger.debug("Received message of size [{}]", message.array().length);
       }
     }
@@ -313,8 +318,7 @@ public class TCPClientConnection implements IConnection {
   protected void onAvpDataException(AvpDataException e) {
     try {
       onEvent(new Event(EventType.DATA_EXCEPTION, e));
-    }
-    catch (AvpDataException e1) {
+    } catch (AvpDataException e1) {
       // ignore
     }
   }
@@ -322,8 +326,7 @@ public class TCPClientConnection implements IConnection {
   protected void onConnected() {
     try {
       onEvent(new Event(EventType.CONNECTED));
-    }
-    catch (AvpDataException e1) {
+    } catch (AvpDataException e1) {
       // ignore
     }
   }
@@ -361,8 +364,7 @@ public class TCPClientConnection implements IConnection {
           }
         }
       }
-    }
-    finally {
+    } finally {
       logger.debug("Releasing lock and finished onEvent for connection [{}]", this.getKey());
       lock.unlock();
     }
@@ -376,8 +378,7 @@ public class TCPClientConnection implements IConnection {
       logger.debug("listeners.size() == 0 on connection [{}]", this.getKey());
       try {
         buffer.add(event);
-      }
-      catch (IllegalStateException e) {
+      } catch (IllegalStateException e) {
         logger.debug("Got IllegalStateException in processBufferedMessages");
         // FIXME : requires JDK6 : buffer.removeLast();
         Event[] tempBuffer = buffer.toArray(new Event[buffer.size()]);
@@ -387,8 +388,7 @@ public class TCPClientConnection implements IConnection {
       //PCB added logging
       logger.debug("processBufferedMessages is returning false");
       return false;
-    }
-    else {
+    } else {
       logger.debug("processBufferedMessages is returning true on connection [{}] as there are listeners", getKey());
       return true;
     }

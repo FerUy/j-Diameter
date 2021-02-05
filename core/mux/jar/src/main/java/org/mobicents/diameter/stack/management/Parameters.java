@@ -63,6 +63,10 @@ public interface Parameters extends Serializable {
 
   void setUseUriAsFqdn(boolean useUriAsFqdn);
 
+  boolean getSingleLocalPeer();
+
+  void setSingleLocalPeer(boolean singleLocalPeer);
+
   int getQueueSize();
 
   void setQueueSize(int queueSize);

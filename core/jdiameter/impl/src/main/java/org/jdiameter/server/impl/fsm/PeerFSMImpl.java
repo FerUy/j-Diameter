@@ -97,7 +97,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
   protected State[] getStates() {
     if (states == null) {
       states = new State[] {
-          new MyState() { // OKEY
+          new MyState() {                        // OKAY
             @Override
             public void entryAction() { // todo send buffered messages
               setInActiveTimer();
@@ -228,7 +228,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
               return true;
             }
           },
-          new MyState() { // SUSPECT
+          new MyState() {                        // SUSPECT
             @Override
             public boolean processEvent(StateEvent event) {
               switch (type(event)) {
@@ -314,7 +314,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
               return true;
             }
           },
-          new MyState() { // DOWN
+          new MyState() {                        // DOWN
             @Override
             public void entryAction() {
               setTimer(0);
@@ -386,7 +386,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
               return true;
             }
           },
-          new MyState() { // REOPEN
+          new MyState() {                        // REOPEN
             @Override
             public boolean processEvent(StateEvent event) {
               switch (type(event)) {
@@ -427,7 +427,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
               return true;
             }
           },
-          new MyState() { // INITIAL
+          new MyState() {                        // INITIAL
             @Override
             public void entryAction() {
               setTimer(CEA_TIMEOUT);
@@ -487,7 +487,7 @@ public class PeerFSMImpl extends org.jdiameter.client.impl.fsm.PeerFSMImpl imple
               return true;
             }
           },
-          new MyState() { // STOPPING
+          new MyState() {                        // STOPPING
             @Override
             public boolean processEvent(StateEvent event) {
               switch (type(event)) {

@@ -178,7 +178,7 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
       logger.debug("Append external connection [{}]", conn.getKey());
     }
     else {
-      logger.debug("Releasing connection [{}]", conn.getKey());
+      logger.error("Releasing connection [{}] due to state [{}]", conn.getKey(), state.name());
       incConnections.remove(conn.getKey());
       try {
         conn.release();
@@ -392,6 +392,8 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
         //     the Diameter application is locally supported, or
         //  -  Both the Destination-Host and the Destination-Realm are not
         //     present.
+        LocalAction action = null;
+        IRealm matched = null;
         if (destHostAvp != null) {
           try {
             String destHost = destHostAvp.getDiameterIdentity();
@@ -399,8 +401,6 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
             if (destHost.equals(metaData.getLocalPeer().getUri().getFQDN())) {
 
               // this is for handling possible REDIRECT, destRealm != local.realm
-              LocalAction action = null;
-              IRealm matched = null;
 
               matched = (IRealm) realmTable.matchRealm(req);
               if (matched != null) {
@@ -413,29 +413,6 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
                 return true;
               }
 
-              switch (action) {
-                case LOCAL: // always call listener - this covers realms
-                  // configured as localy processed and
-                  // LocalPeer.realm
-                  isProcessed = consumeMessage(message);
-                  break;
-                case PROXY:
-                  //TODO: change this its almost the same as above, make it sync, so no router code involved
-                  if (handleByAgent(message, isProcessed, req, matched)) {
-                    isProcessed = true;
-                  }
-                  break;
-                case RELAY: // might be complicated, lets make it listener
-                  // now
-                  isProcessed = consumeMessage(message); //if its not redirected its
-                  break;
-                case REDIRECT:
-                  //TODO: change this its almost the same as above, make it sync, so no router code involved
-                  if (handleByAgent(message, isProcessed, req, matched)) {
-                    isProcessed = true;
-                  }
-                  break;
-              }
             }
             else {
               //NOTE: this check should be improved, it checks if there is connection to peer, otherwise we cant serve it.
@@ -445,12 +422,18 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
                 isProcessed = consumeMessage(message);
               }
               else {
-                // RFC 3588 // 6.1
-                //   4. If none of the above is successful, an answer is returned with the
-                //   Result-Code set to DIAMETER_UNABLE_TO_DELIVER, with the E-bit set.
-                logger.warn("Received message for unknown peer [{}]. Answering with 3002 (UNABLE_TO_DELIVER) Result-Code.", destHost);
-                sendErrorAnswer(req, "No connection to peer", ResultCode.UNABLE_TO_DELIVER);
-                isProcessed = true;
+                matched = (IRealm) realmTable.matchRealm(req);
+                if (matched != null) {
+                  action = matched.getLocalAction();
+                } else {
+
+                  // RFC 3588 // 6.1
+                  //   4. If none of the above is successful, an answer is returned with the
+                  //   Result-Code set to DIAMETER_UNABLE_TO_DELIVER, with the E-bit set.
+                  logger.warn("Received message for unknown peer [{}]. Answering with 3002 (UNABLE_TO_DELIVER) Result-Code.", destHost);
+                  sendErrorAnswer(req, "No connection to peer", ResultCode.UNABLE_TO_DELIVER);
+                  isProcessed = true;
+                }
               }
             }
           }
@@ -462,43 +445,40 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
         }
         else {
           // we have to match realms :) this MUST include local realm
-          LocalAction action = null;
-          IRealm matched = null;
 
           matched = (IRealm) realmTable.matchRealm(req);
           if (matched != null) {
             action = matched.getLocalAction();
-          }
-          else {
+          } else {
             // We don't support it locally, its not defined as remote, so send no such realm answer.
             sendErrorAnswer(message, null, ResultCode.APPLICATION_UNSUPPORTED);
             // or REALM_NOT_SERVED ?
             return true;
           }
-
-          switch (action) {
-            case LOCAL: // always call listener - this covers realms
-              // configured as locally processed and LocalPeer.realm
-              isProcessed = consumeMessage(message);
-              break;
-            case PROXY:
-              //TODO: change this its almost the same as above, make it sync, so no router code involved
-              if ( handleByAgent(message, isProcessed, req, matched)) {
-                isProcessed = true;
-              }
-              break;
-            case RELAY: // might be complicated, lets make it listener
-              // now
-              isProcessed = consumeMessage(message);
-              break;
-            case REDIRECT:
-              //TODO: change this its almost the same as above, make it sync, so no router code involved
-              if (handleByAgent(message, isProcessed, req, matched)) {
-                isProcessed = true;
-              }
-              break;
-          }
         }
+        switch (action) {
+          case LOCAL: // always call listener - this covers realms
+            // configured as locally processed and LocalPeer.realm
+            isProcessed = consumeMessage(message);
+            break;
+          case PROXY:
+            //TODO: change this its almost the same as above, make it sync, so no router code involved
+            if ( handleByAgent(message, isProcessed, req, matched)) {
+              isProcessed = true;
+            }
+            break;
+          case RELAY: // might be complicated, lets make it listener
+            // now
+            isProcessed = consumeMessage(message);
+            break;
+          case REDIRECT:
+            //TODO: change this its almost the same as above, make it sync, so no router code involved
+            if (handleByAgent(message, isProcessed, req, matched)) {
+              isProcessed = true;
+            }
+            break;
+        }
+
       }
       else {
         // answer, let client do its work

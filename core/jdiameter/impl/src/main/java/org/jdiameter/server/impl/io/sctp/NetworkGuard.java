@@ -37,6 +37,8 @@ import org.mobicents.protocols.api.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jdiameter.client.impl.helpers.Parameters.SingleLocalPeer;
+
 /**
  * SCTP implementation of {@link org.jdiameter.server.api.io.INetworkGuard}.
  *
@@ -73,16 +75,19 @@ public class NetworkGuard implements INetworkGuard {
     this.serverConnections = new ArrayList<SCTPServerConnection>();
 
     try {
-      for (InetAddress ia : inetAddresses) {
-        final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(null, ia, port, parser, null, this);
+      if (data.getConfiguration().getBooleanValue(SingleLocalPeer.ordinal(), true)) {
+        final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(null, inetAddresses[0], port, parser, null, this, true);
         this.serverConnections.add(sctpServerConnection);
+      } else {
+        for (InetAddress ia : inetAddresses) {
+          final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(null, ia, port, parser, null, this);
+          this.serverConnections.add(sctpServerConnection);
+        }
       }
-    }
-    catch (Exception exc) {
+    } catch (Exception exc) {
       try {
         destroy();
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         // ignore
       }
       throw new Exception(exc);

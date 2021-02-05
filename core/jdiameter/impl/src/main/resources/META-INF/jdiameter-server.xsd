@@ -77,7 +77,8 @@
                 </xsi:complexType>
             </xsi:element>
             <xsi:element ref="Applications" minOccurs="0" maxOccurs="1" />
-            <xsi:element ref="OverloadMonitor" minOccurs="0" maxOccurs="1" />        </xsi:sequence>
+            <xsi:element ref="OverloadMonitor" minOccurs="0" maxOccurs="1" />
+        </xsi:sequence>
         <!-- must match SecurityData.name -->
         <xsi:attribute name="security_ref"  type="xsi:string" use="optional"/>
     </xsi:complexType>
@@ -215,6 +216,14 @@
                 <xsi:complexType>
                    <xsi:attribute name="value" type="xsi:boolean" use="required"/>
                </xsi:complexType>
+            </xsi:element>
+            <xsi:element name="SingleLocalPeer" minOccurs="0" maxOccurs="1">
+                <xsi:annotation>
+                    <xsi:documentation>Enable multihomed single server or start as many servers as IPAddresses defined for LocalPeer</xsi:documentation>
+                </xsi:annotation>
+                <xsi:complexType>
+                    <xsi:attribute name="value" type="xsi:boolean" use="optional"/>
+                </xsi:complexType>
             </xsi:element>
             <xsi:element name="QueueSize" minOccurs="1" maxOccurs="1">
                 <xsi:annotation>
@@ -411,9 +420,11 @@
                 <xsi:complexType>
                    <xsi:attribute name="name" type="xsi:string" use="required"/>
                    <xsi:attribute name="ip" type="xsi:string" use="optional"/>
-                   <xsi:attribute name="portRange" type="xsi:string" use="optional"/>
-                   <xsi:attribute name="attempt_connect" type="xsi:boolean" use="required"/>
-                   <xsi:attribute name="rating" type="xsi:integer" use="required"/>
+                    <xsi:attribute name="host" type="xsi:string" use="optional"/>
+                    <xsi:attribute name="portRange" type="xsi:string" use="optional"/>
+                    <xsi:attribute name="attempt_connect" type="xsi:boolean" use="required"/>
+                    <xsi:attribute name="rating" type="xsi:integer" use="required"/>
+                   <xsi:attribute name="standby_addresses" type="xsi:string" use="optional"/>
                    <xsi:attribute name="security_ref" type="xsi:string" use="optional"/>
                </xsi:complexType>
             </xsi:element>

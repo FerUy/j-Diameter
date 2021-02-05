@@ -44,7 +44,6 @@ package org.jdiameter.client.api.io;
 
 import java.io.IOException;
 import java.net.InetAddress;
-
 import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Wrapper;
 import org.jdiameter.client.api.IMessage;
@@ -137,4 +136,5 @@ public interface IConnection extends Wrapper {
    * @param connectionListener listener instance
    */
   void remConnectionListener(IConnectionListener connectionListener);
+
 }

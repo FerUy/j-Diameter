@@ -112,7 +112,7 @@ public class LocationServerSimulator {
                     REFERENCE_NUMBER[IntegerAsString]
                 }
                 Examples:
-                curl -X GET 127.0.0.1:4567/lrr?msisdn=59899077937\&locationEvent=4\&lcsReferenceNumber=31
+                curl -X GET 127.0.0.1:4567/lrr?msisdn=59899077937\&locationEvent=4\&lcsReferenceNumber=1
                 Web browser
                 http://localhost:4567/lrr?msisdn=573195897484&locationEvent=2&lcsReferenceNumber=281
 
@@ -216,7 +216,7 @@ public class LocationServerSimulator {
 
         String subscriberIdentity = commandParameter[1];
         Integer locationEventType = Integer.parseInt(commandParameter[2]);    // MO_LR(2)
-        String lcsReferenceNumber = commandParameter[3];
+        Integer lcsReferenceNumber = Integer.parseInt(commandParameter[3]);
 
         this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, lcsReferenceNumber, false);
     }
@@ -225,7 +225,8 @@ public class LocationServerSimulator {
         String result = "\nLRR sent successfully!\n";
         try {
             Integer locationEventType = Integer.parseInt(locationEvent);
-            this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, lcsReferenceNumber, isImsi);
+            Integer referenceNumber = Integer.parseInt(lcsReferenceNumber);
+            this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, referenceNumber, isImsi);
         } catch (Exception e) {
             result = String.format("\nLRR caused an exception '%s' - not sent!\n", e.getMessage());
         }

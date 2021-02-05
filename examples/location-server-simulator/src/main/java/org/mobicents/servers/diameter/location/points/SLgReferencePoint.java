@@ -27,9 +27,11 @@ import org.mobicents.protocols.ss7.map.api.MAPException;
 import org.mobicents.protocols.ss7.map.api.service.lsm.AddGeographicalInformation;
 import org.mobicents.protocols.ss7.map.api.service.lsm.VelocityType;
 import org.mobicents.protocols.ss7.map.api.service.mobility.subscriberInformation.TypeOfShape;
+import org.mobicents.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
 import org.mobicents.protocols.ss7.map.service.lsm.AddGeographicalInformationImpl;
 import org.mobicents.protocols.ss7.map.service.lsm.ExtGeographicalInformationImpl;
 import org.mobicents.protocols.ss7.map.service.lsm.VelocityEstimateImpl;
+import org.mobicents.protocols.ss7.map.service.mobility.subscriberInformation.EUtranCgiImpl;
 import org.mobicents.servers.diameter.location.data.SubscriberElement;
 import org.mobicents.servers.diameter.location.data.SubscriberInformation;
 import org.mobicents.servers.diameter.location.data.elements.EllipsoidPoint;
@@ -40,9 +42,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
+import static org.mobicents.servers.diameter.utils.TBCDUtil.parseTBCD;
+import static org.mobicents.servers.diameter.utils.TBCDUtil.setAreaIdParams;
+import static org.mobicents.servers.diameter.utils.TBCDUtil.toTBCDString;
+
 /**
- * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
+ * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
  */
 public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkReqListener, EventListener<Request, Answer> {
 
@@ -123,7 +129,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         }
 
         if (plrAvpSet.getAvp(Avp.MSISDN) != null) {
-            msisdn = plrAvpSet.getAvp(Avp.MSISDN).getUTF8String();
+            msisdn = toTBCDString(plrAvpSet.getAvp(Avp.MSISDN).getOctetString());
         }
 
         if (logger.isInfoEnabled()) {
@@ -211,8 +217,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                     //plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
                 }
 
-                if (subscriberElement.eutranCellGlobalIdentity != null)
-                    plaAvpSet.addAvp(Avp.ECGI, subscriberElement.eutranCellGlobalIdentity, 10415, true, false, true);
+                if (subscriberElement.eutranCellGlobalIdentity != null) {
+                    String[] ecgiArray = subscriberElement.eutranCellGlobalIdentity.split("-");
+                    Integer[] ecgiParams = setAreaIdParams(ecgiArray, "eUtranCellId");
+                    EUtranCgiImpl ecgi = new EUtranCgiImpl();
+                    ecgi.setData(ecgiParams[0], ecgiParams[1], ecgiParams[2]);
+                    plaAvpSet.addAvp(Avp.ECGI, ecgi.getData(), 10415, true, false);
+                }
 
                 if (subscriberElement.geranPositioningData != null && subscriberElement.geranGanssPositioningData != null) {
                     AvpSet geranPositioningInfo = plaAvpSet.addGroupedAvp(Avp.GERAN_POSITIONING_INFO, 10415, false, false);
@@ -220,8 +231,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                     geranPositioningInfo.addAvp(Avp.GERAN_GANSS_POSITIONING_DATA, subscriberElement.geranGanssPositioningData, 10415, false, false, true);
                 }
 
-                if (subscriberElement.cellGlobalIdentity != null)
-                    plaAvpSet.addAvp(Avp.CELL_GLOBAL_IDENTITY, subscriberElement.cellGlobalIdentity, 10415, false, false, true);
+                if (subscriberElement.cellGlobalIdentity != null) {
+                    String[] cgiArray = subscriberElement.cellGlobalIdentity.split("-");
+                    Integer[] cgiParams = setAreaIdParams(cgiArray, "cellGlobalId");
+                    CellGlobalIdOrServiceAreaIdFixedLengthImpl cgi = new CellGlobalIdOrServiceAreaIdFixedLengthImpl();
+                    cgi.setData(cgiParams[0], cgiParams[1], cgiParams[2], cgiParams[3]);
+                    plaAvpSet.addAvp(Avp.CELL_GLOBAL_IDENTITY, cgi.getData(), 10415, false, false);
+                }
 
                 if (subscriberElement.utranPositioningData != null && subscriberElement.utranGanssPositioningData != null &&
                     subscriberElement.utranAdditionalPositioningData != null) {
@@ -231,8 +247,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                     utranPositioningInfo.addAvp(Avp.UTRAN_ADDITIONAL_POSITIONING_DATA, subscriberElement.utranAdditionalPositioningData,10415,false,false,true);
                 }
 
-                if (subscriberElement.serviceAreaIdentity != null)
-                    plaAvpSet.addAvp(Avp.SERVICE_AREA_IDENTITY, subscriberElement.serviceAreaIdentity, 10415, false, false, true);
+                if (subscriberElement.serviceAreaIdentity != null) {
+                    String[] saiArray = subscriberElement.serviceAreaIdentity.split("-");
+                    Integer[] saiParams = setAreaIdParams(saiArray, "cellGlobalId");
+                    CellGlobalIdOrServiceAreaIdFixedLengthImpl sai = new CellGlobalIdOrServiceAreaIdFixedLengthImpl();
+                    sai.setData(saiParams[0], saiParams[1], saiParams[2], saiParams[3]);
+                    plaAvpSet.addAvp(Avp.SERVICE_AREA_IDENTITY, sai.getData(), 10415, false, false);
+                }
 
                 if (subscriberElement.servingNode != null) {
                     AvpSet servingNode = plaAvpSet.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
@@ -252,7 +273,11 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
                 if (subscriberElement.esmlcCellInfoEcgi != null && subscriberElement.esmlcCellInfoCpi != null) {
                     AvpSet esmlcCellInfo = plaAvpSet.addGroupedAvp(Avp.ESMLC_CELL_INFO, 10415, false, false);
-                    esmlcCellInfo.addAvp(Avp.ECGI, subscriberElement.esmlcCellInfoEcgi, 10415, false, false, true);
+                    String[] esmlcEcgiArray = subscriberElement.esmlcCellInfoEcgi.split("-");
+                    Integer[] ecgiParams = setAreaIdParams(esmlcEcgiArray, "eUtranCellId");
+                    EUtranCgiImpl ecgi = new EUtranCgiImpl();
+                    ecgi.setData(ecgiParams[0], ecgiParams[1], ecgiParams[2]);
+                    esmlcCellInfo.addAvp(Avp.ECGI, ecgi.getData(), 10415, false, false);
                     esmlcCellInfo.addAvp(Avp.CELL_PORTION_ID, subscriberElement.esmlcCellInfoCpi, 10415, false, false, true);
                 }
 
@@ -346,7 +371,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         session.sendProvideLocationAnswer(pla);
     }
 
-    public void sendLocationReportRequest(String subscriberIdentity, Integer locationEventType, String lcsReferenceNumber, Boolean isImsi)
+    public void sendLocationReportRequest(String subscriberIdentity, Integer locationEventType, Integer lcsReferenceNumber, Boolean isImsi)
             throws InternalException, RouteException, OverloadException, IllegalDiameterStateException {
 
         int resultCode = ResultCode.SUCCESS;
@@ -380,7 +405,7 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 lrrAvpSet.addAvp(Avp.USER_NAME, subscriberElement.imsi, true, false, false);
 
             if (subscriberElement.msisdn != null)
-                lrrAvpSet.addAvp(Avp.MSISDN, subscriberElement.msisdn, 10415, true, false, true);
+                lrrAvpSet.addAvp(Avp.MSISDN, parseTBCD(subscriberElement.msisdn), 10415, true, false);
 
             if (subscriberElement.imei != null)
                 lrrAvpSet.addAvp(Avp.TGPP_IMEI, subscriberElement.imei, 10415, true, false, false);
@@ -450,8 +475,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 //lrrAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
             }
 
-            if (subscriberElement.eutranCellGlobalIdentity != null)
-                lrrAvpSet.addAvp(Avp.ECGI, subscriberElement.eutranCellGlobalIdentity,10415, false, false, true);
+            if (subscriberElement.eutranCellGlobalIdentity != null) {
+                String[] ecgiArray = subscriberElement.eutranCellGlobalIdentity.split("-");
+                Integer[] ecgiParams = setAreaIdParams(ecgiArray, "eUtranCellId");
+                EUtranCgiImpl ecgi = new EUtranCgiImpl();
+                ecgi.setData(ecgiParams[0], ecgiParams[1], ecgiParams[2]);
+                lrrAvpSet.addAvp(Avp.ECGI, ecgi.getData(), 10415, true, false);
+            }
 
             if (subscriberElement.geranPositioningData != null && subscriberElement.geranGanssPositioningData != null) {
                 AvpSet geranPositioningInfo = lrrAvpSet.addGroupedAvp(Avp.GERAN_POSITIONING_INFO, 10415, false, false);
@@ -459,8 +489,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 geranPositioningInfo.addAvp(Avp.GERAN_GANSS_POSITIONING_DATA, subscriberElement.geranGanssPositioningData, 10415, false, false,true);
             }
 
-            if (subscriberElement.cellGlobalIdentity != null)
-                lrrAvpSet.addAvp(Avp.CELL_GLOBAL_IDENTITY, subscriberElement.cellGlobalIdentity, 10415, false, false, true);
+            if (subscriberElement.cellGlobalIdentity != null) {
+                String[] cgiArray = subscriberElement.cellGlobalIdentity.split("-");
+                Integer[] cgiParams = setAreaIdParams(cgiArray, "cellGlobalId");
+                CellGlobalIdOrServiceAreaIdFixedLengthImpl cgi = new CellGlobalIdOrServiceAreaIdFixedLengthImpl();
+                cgi.setData(cgiParams[0], cgiParams[1], cgiParams[2], cgiParams[3]);
+                lrrAvpSet.addAvp(Avp.CELL_GLOBAL_IDENTITY, cgi.getData(), 10415, false, false);
+            }
 
             if (subscriberElement.utranPositioningData != null && subscriberElement.utranGanssPositioningData != null &&
                 subscriberElement.utranAdditionalPositioningData != null) {
@@ -470,8 +505,13 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 utranPositioningInfo.addAvp(Avp.UTRAN_ADDITIONAL_POSITIONING_DATA, subscriberElement.utranAdditionalPositioningData, 10415, false, false, true);
             }
 
-            if (subscriberElement.serviceAreaIdentity != null)
-                lrrAvpSet.addAvp(Avp.SERVICE_AREA_IDENTITY, subscriberElement.serviceAreaIdentity, 10415, false, false, true);
+            if (subscriberElement.serviceAreaIdentity != null) {
+                String[] saiArray = subscriberElement.serviceAreaIdentity.split("-");
+                Integer[] saiParams = setAreaIdParams(saiArray, "cellGlobalId");
+                CellGlobalIdOrServiceAreaIdFixedLengthImpl sai = new CellGlobalIdOrServiceAreaIdFixedLengthImpl();
+                sai.setData(saiParams[0], saiParams[1], saiParams[2], saiParams[3]);
+                lrrAvpSet.addAvp(Avp.SERVICE_AREA_IDENTITY, sai.getData(), 10415, false, false);
+            }
 
             if (subscriberElement.lcsServiceTypeId != null)
                 lrrAvpSet.addAvp(Avp.LCS_SERVICE_TYPE_ID, subscriberElement.lcsServiceTypeId, 10415, true, false, true);
@@ -529,7 +569,11 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
             if (subscriberElement.esmlcCellInfoEcgi != null && subscriberElement.esmlcCellInfoCpi != null) {
                 AvpSet esmlcCellInfo = lrrAvpSet.addGroupedAvp(Avp.ESMLC_CELL_INFO, 10415, false, false);
-                esmlcCellInfo.addAvp(Avp.ECGI, subscriberElement.esmlcCellInfoEcgi, 10415, false, false, true);
+                String[] esmlcEcgiArray = subscriberElement.esmlcCellInfoEcgi.split("-");
+                Integer[] ecgiParams = setAreaIdParams(esmlcEcgiArray, "eUtranCellId");
+                EUtranCgiImpl ecgi = new EUtranCgiImpl();
+                ecgi.setData(ecgiParams[0], ecgiParams[1], ecgiParams[2]);
+                esmlcCellInfo.addAvp(Avp.ECGI, ecgi.getData(), 10415, false, false);
                 esmlcCellInfo.addAvp(Avp.CELL_PORTION_ID, subscriberElement.esmlcCellInfoCpi, 10415, false, false, true);
             }
 
