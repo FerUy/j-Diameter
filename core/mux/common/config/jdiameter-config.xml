@@ -59,6 +59,9 @@
     <!-- Router Request Table Cache Size and ClearSize -->
     <RequestTable size="10240" clear_size="2048" />
 
+    <!--    Max concurrent connections count-->
+    <MaxConcurrentConnections value="10" />
+
   </Parameters>
 
   <Network>

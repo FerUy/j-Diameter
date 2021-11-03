@@ -38,6 +38,7 @@ import org.jdiameter.client.api.io.IConnectionListener;
 import org.jdiameter.client.api.io.TransportError;
 import org.jdiameter.client.api.io.TransportException;
 import org.jdiameter.client.api.parser.IMessageParser;
+import org.jdiameter.server.impl.helpers.Parameters;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.api.Server;
@@ -97,7 +98,8 @@ public class SCTPServerConnection implements IConnection {
       }
       server.setExtraHostAddress(extraHostAddress);
     }
-
+    Integer maxConcurrentConnectionCount = config.getIntValue(Parameters.MaxConcurrentConnections.ordinal(), 11);
+    server.setMaxConcurrentConnectionCount(maxConcurrentConnectionCount);
     server.startServer();
   }
 

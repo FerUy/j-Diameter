@@ -76,12 +76,14 @@ import static org.jdiameter.client.impl.helpers.Parameters.PeerHost;
 import static org.jdiameter.client.impl.helpers.Parameters.PeerStandbyAddresses;
 import static org.jdiameter.client.impl.helpers.Parameters.SecurityRef;
 import static org.jdiameter.client.impl.helpers.Parameters.UseUriAsFqdn;
+import static org.jdiameter.server.impl.helpers.Parameters.Applications;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +91,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.jdiameter.api.ApplicationId;
 import org.jdiameter.api.Avp;
@@ -257,6 +260,8 @@ public class PeerImpl extends AbstractPeer implements IPeer {
     }
   };
 
+  protected final Set<String> applications = new HashSet<>();
+
   public PeerImpl(final PeerTableImpl table, int rating, URI remotePeer, String ip, String portRange, IMetaData metaData, Configuration config,
                   Configuration peerConfig, IFsmFactory fsmFactory, ITransportLayerFactory trFactory, IStatisticManager statisticFactory,
                   IConcurrentFactory concurrentFactory, IMessageParser parser, final ISessionDatasource sessionDataSource)
@@ -300,6 +305,7 @@ public class PeerImpl extends AbstractPeer implements IPeer {
     if (connection == null) {
       String peerHost = peerConfig.getStringValue(PeerHost.ordinal(), null);
       String ref = peerConfig.getStringValue(SecurityRef.ordinal(), null);
+      String appIDs = peerConfig.getStringValue(Applications.ordinal(), null);
       String[] extraHostAddresses = null;
       InetAddress localAddress = null;
       try {
@@ -319,6 +325,9 @@ public class PeerImpl extends AbstractPeer implements IPeer {
           } else {
             localAddress = InetAddress.getByName(metaData.getLocalPeer().getUri().getFQDN());
           }
+        }
+        if ((appIDs != null && appIDs.trim().length() > 0)) {
+          applications.addAll(Arrays.asList(appIDs.trim().split(",")));
         }
       } catch (Exception e) {
         logger.warn("Unable to get local address", e);
@@ -667,7 +676,9 @@ public class PeerImpl extends AbstractPeer implements IPeer {
     for (ApplicationId l : locAppId) {
       for (ApplicationId r : remAppId) {
         if (l.equals(r)) {
-          newAppId.add(l);
+          if (applications.isEmpty() || applications.contains(String.valueOf(l.getAppId()))) {
+            newAppId.add(l);
+          }
         } else if (r.getAcctAppId() == INT_COMMON_APP_ID || r.getAuthAppId() == INT_COMMON_APP_ID ||
             l.getAcctAppId() == INT_COMMON_APP_ID || l.getAuthAppId() == INT_COMMON_APP_ID) {
           newAppId.add(r);
@@ -812,7 +823,7 @@ public class PeerImpl extends AbstractPeer implements IPeer {
         connection.sendMessage(message);
         logger.debug("Connection sent message [{}] to peer [{}] over the network", message, getUri());
 
-        logger.info("SessionId [{}] message sent", message.getSessionId(), message.getHopByHopIdentifier(), message.getEndToEndIdentifier());
+        logger.debug("SessionId [{}] message sent", message.getSessionId(), message.getHopByHopIdentifier(), message.getEndToEndIdentifier());
       } catch (Exception e) {
         logger.error("SessionId [{}] caught exception [{}]", message.getSessionId(), e);
         throw e;
@@ -845,7 +856,9 @@ public class PeerImpl extends AbstractPeer implements IPeer {
       message.getAvps().addAvp(VENDOR_ID, metaData.getLocalPeer().getVendorId(), true, false, true);
       message.getAvps().addAvp(PRODUCT_NAME, metaData.getLocalPeer().getProductName(), false);
       for (ApplicationId appId : metaData.getLocalPeer().getCommonApplications()) {
-        addAppId(appId, message);
+        if (applications.isEmpty() || applications.contains(String.valueOf(appId.getAppId()))) {
+          addAppId(appId, message);
+        }
       }
       message.getAvps().addAvp(FIRMWARE_REVISION, metaData.getLocalPeer().getFirmware(), true);
       message.getAvps().addAvp(ORIGIN_STATE_ID, metaData.getLocalHostStateId(), true, false, true);
@@ -1006,7 +1019,9 @@ public class PeerImpl extends AbstractPeer implements IPeer {
           } else {
             logger.debug("CEA did not contained appId, therefore set local appids to common-appid field");
             commonApplications.clear();
-            commonApplications.addAll(metaData.getLocalPeer().getCommonApplications());
+            commonApplications.addAll(metaData.getLocalPeer().getCommonApplications().stream()
+                    .filter(application -> (applications.isEmpty() || applications.contains(String.valueOf(application.getAppId()))))
+                    .collect(Collectors.toList()));
           }
 
           if (firmWare == 0 && frmId != null) {

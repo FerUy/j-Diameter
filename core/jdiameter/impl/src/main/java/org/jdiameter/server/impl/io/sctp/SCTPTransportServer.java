@@ -58,6 +58,7 @@ public class SCTPTransportServer {
   private int payloadProtocolId = 0;
   private int streamNumber = 0;
   private String[] extraHostAddress = null;
+  private Integer maxConcurrentConnectionCount;
 
   public SCTPTransportServer() {
   }
@@ -142,7 +143,7 @@ public class SCTPTransportServer {
         this.management.setSingleThread(true);
         this.management.start();
         // Clear any saved connections, we will get them from jdiameter-config.xml
-        this.management.removeAllResourses();
+        this.management.removeAllResources();
       }
 
       logger.debug("Orig Address: '{}:{}'", origAddress.getAddress().getHostAddress(), origAddress.getPort());
@@ -161,7 +162,7 @@ public class SCTPTransportServer {
       // We don't have any, let's create it
       if (server == null) {
         server = this.management.addServer(serverName, origAddress.getAddress().getHostAddress(), origAddress.getPort(),
-            IpChannelType.SCTP, true, 10, extraHostAddress);
+            IpChannelType.SCTP, true, this.maxConcurrentConnectionCount, extraHostAddress);
       }
 
       for (String assocName : server.getAssociations()) {
@@ -203,6 +204,10 @@ public class SCTPTransportServer {
 
   public void setExtraHostAddress(String[] extraHostAddress) {
     this.extraHostAddress = extraHostAddress;
+  }
+
+  public void setMaxConcurrentConnectionCount(Integer maxConcurrentConnectionCount) {
+    this.maxConcurrentConnectionCount = maxConcurrentConnectionCount;
   }
 
   private class ServerAssociationListener implements AssociationListener {

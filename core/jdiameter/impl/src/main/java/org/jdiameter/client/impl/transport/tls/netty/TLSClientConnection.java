@@ -105,6 +105,34 @@ public class TLSClientConnection implements IConnection {
     // this.client.start();
   }
 
+  public TLSClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
+                             int remotePort, InetAddress localAddress, int localPort, String[] extraHostAddresses,
+                             String standbyRemoteAddresses, IConnectionListener listener, IMessageParser parser, String ref)
+          throws InterruptedException {
+    this.listeners.add(listener);
+
+    if (extraHostAddresses != null && extraHostAddresses.length > 0) {
+      logger.warn("ExtraHostAddresses[{}] can't be bound to local server using TCP.", extraHostAddresses.length);
+    }
+    if (standbyRemoteAddresses != null && standbyRemoteAddresses.length() > 0) {
+      logger.warn("Secondary/stand-by remote connection [{}] not yet implemented over TCP.", standbyRemoteAddresses);
+    }
+
+    String secRef = ref;
+    if (secRef == null) {
+      if (!config.isAttributeExist(Parameters.SecurityRef.ordinal())) {
+        throw new IllegalArgumentException("No security_ref attribute present in local peer!");
+      } else {
+        secRef = config.getStringValue(Parameters.SecurityRef.ordinal(), "");
+      }
+    }
+    this.sslConfig = TLSUtils.getSSLConfiguration(config, secRef);
+
+    this.client = new TLSTransportClient(this, concurrentFactory, parser, sslConfig,
+            new InetSocketAddress(remoteAddress, remotePort), new InetSocketAddress(localAddress, localPort));
+    // this.client.start();
+  }
+
   public TLSClientConnection(Configuration config, Configuration localPeerSSLConfig, IConcurrentFactory concurrentFactory,
       IMessageParser parser, Channel channel) throws Exception {
 

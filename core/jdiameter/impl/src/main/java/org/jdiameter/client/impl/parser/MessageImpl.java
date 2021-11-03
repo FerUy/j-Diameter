@@ -99,7 +99,6 @@ public class MessageImpl implements IMessage {
   /**
    * Create empty message
    *
-   * @param parser
    * @param commandCode
    * @param appId
    */
@@ -114,7 +113,6 @@ public class MessageImpl implements IMessage {
   /**
    * Create empty message
    *
-   * @param parser
    * @param commandCode
    * @param applicationId
    * @param flags

@@ -54,10 +54,10 @@ import static org.jdiameter.common.api.app.acc.ClientAccSessionState.PENDING_STA
 import java.io.Serializable;
 
 import org.jdiameter.api.Answer;
+import org.jdiameter.api.Message;
 import org.jdiameter.api.Avp;
 import org.jdiameter.api.EventListener;
 import org.jdiameter.api.InternalException;
-import org.jdiameter.api.Message;
 import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.Request;
 import org.jdiameter.api.RouteException;

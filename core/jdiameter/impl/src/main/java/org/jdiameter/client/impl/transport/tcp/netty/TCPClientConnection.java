@@ -79,6 +79,21 @@ public class TCPClientConnection implements IConnection {
     listeners.add(listener);
   }
 
+  public TCPClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress,
+                             int remotePort, InetAddress localAddress, int localPort, String[] extraHostAddresses,
+                             String standbyRemoteAddresses, IConnectionListener listener, IMessageParser parser,
+                             String ref) {
+    this(config, concurrentFactory, remoteAddress, remotePort, localAddress, localPort, parser, ref);
+    if (extraHostAddresses != null && extraHostAddresses.length > 0) {
+      logger.warn("ExtraHostAddresses[{}] can't be bound to local server using TCP.", extraHostAddresses.length);
+    }
+    if (standbyRemoteAddresses != null && standbyRemoteAddresses.length() > 0) {
+      logger.warn("Secondary/stand-by remote connection [{}] not yet implemented over TCP.", standbyRemoteAddresses);
+    }
+
+    listeners.add(listener);
+  }
+
   public TCPClientConnection(Channel channel, IMessageParser parser) {
     this.parser = parser;
     this.client = new TCPTransportClient(this, parser, channel);

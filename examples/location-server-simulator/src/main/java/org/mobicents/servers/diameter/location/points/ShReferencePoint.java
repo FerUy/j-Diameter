@@ -32,8 +32,8 @@ import static org.mobicents.servers.diameter.utils.TBCDUtil.parseTBCD;
 import static org.mobicents.servers.diameter.utils.TBCDUtil.toTBCDString;
 
 /**
- * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
+ * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
 public class ShReferencePoint extends ShSessionFactoryImpl implements NetworkReqListener, EventListener<Request, Answer> {
 

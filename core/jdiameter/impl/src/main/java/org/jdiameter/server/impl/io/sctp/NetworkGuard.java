@@ -76,11 +76,11 @@ public class NetworkGuard implements INetworkGuard {
 
     try {
       if (data.getConfiguration().getBooleanValue(SingleLocalPeer.ordinal(), true)) {
-        final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(null, inetAddresses[0], port, parser, null, this, true);
+        final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(data.getConfiguration(), inetAddresses[0], port, parser, null, this, true);
         this.serverConnections.add(sctpServerConnection);
       } else {
         for (InetAddress ia : inetAddresses) {
-          final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(null, ia, port, parser, null, this);
+          final SCTPServerConnection sctpServerConnection = new SCTPServerConnection(data.getConfiguration(), ia, port, parser, null, this);
           this.serverConnections.add(sctpServerConnection);
         }
       }

@@ -50,6 +50,7 @@ import java.io.Serializable;
  * Accounting application id and Vendor id.
  *
  * @author erick.svenson@yahoo.com
+ * @author joram.herrera2@gmail.com
  * @version 1.5.1 Final
  */
 public final class ApplicationId implements Serializable {
@@ -90,6 +91,7 @@ public final class ApplicationId implements Serializable {
   }
 
 
+  private Integer appId;
   private long venId = UNDEFINED_VALUE;
   private long authId = UNDEFINED_VALUE;
   private long acctId = UNDEFINED_VALUE;
@@ -143,6 +145,15 @@ public final class ApplicationId implements Serializable {
     this.authId = authAppId;
     this.acctId = acctAppId;
     this.venId = vendorId;
+  }
+
+  public Integer getAppId() {
+    return appId;
+  }
+
+  public ApplicationId setAppId(Integer appId) {
+    this.appId = appId;
+    return this;
   }
 
   /**

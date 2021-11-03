@@ -42,6 +42,7 @@
 
 package org.jdiameter.server.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +52,6 @@ import org.jdiameter.api.ApplicationId;
 import org.jdiameter.api.InternalException;
 import org.jdiameter.api.LocalAction;
 import org.jdiameter.api.Message;
-import org.jdiameter.api.NetworkReqListener;
 import org.jdiameter.api.Peer;
 import org.jdiameter.api.Realm;
 import org.jdiameter.api.Selector;
@@ -75,8 +75,9 @@ import org.slf4j.LoggerFactory;
  * @author erick.svenson@yahoo.com
  * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
  * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
+ * @author <a href="joram.herrera2@gmail.com"> Joram Herrera </a>
  */
-public class NetworkImpl implements INetwork {
+public class NetworkImpl implements INetwork  {
 
   private static final Logger logger = LoggerFactory.getLogger(NetworkImpl.class);
 
@@ -85,8 +86,8 @@ public class NetworkImpl implements INetwork {
   protected IMetaData metaData;
   private final ApplicationId commonAuthAppId = ApplicationId.createByAuthAppId(0, 0xffffffff);
   private final ApplicationId commonAccAppId = ApplicationId.createByAccAppId(0, 0xffffffff);
-  private final ConcurrentHashMap<ApplicationId, NetworkReqListener> appIdToNetListener = new ConcurrentHashMap<ApplicationId, NetworkReqListener>();
-  private final ConcurrentHashMap<Selector, NetworkReqListener> selectorToNetListener = new ConcurrentHashMap<Selector, NetworkReqListener>();
+  private final ConcurrentHashMap<ApplicationId, Object> appIdToNetListener = new ConcurrentHashMap<ApplicationId, Object>();
+  private final ConcurrentHashMap<Selector,  Object> selectorToNetListener = new ConcurrentHashMap<Selector, Object>();
 
   protected IStatistic statistic;
 
@@ -123,7 +124,7 @@ public class NetworkImpl implements INetwork {
   }
 
   @Override
-  public void addNetworkReqListener(NetworkReqListener networkReqListener, ApplicationId... applicationId) throws ApplicationAlreadyUseException {
+  public void addNetworkReqListener(Object networkListener, ApplicationId... applicationId) throws ApplicationAlreadyUseException {
     for (ApplicationId a : applicationId) {
       if (appIdToNetListener.containsKey(commonAuthAppId) || appIdToNetListener.containsKey(commonAccAppId)) {
         throw new ApplicationAlreadyUseException(a + " already use by common application id");
@@ -133,14 +134,14 @@ public class NetworkImpl implements INetwork {
         throw new ApplicationAlreadyUseException(a + " already use");
       }
 
-      appIdToNetListener.put(a, networkReqListener);
+      appIdToNetListener.put(a, networkListener);
       metaData.addApplicationId(a); // this has ALL config declared, we need currently deployed
       router.getRealmTable().addLocalApplicationId(a);
     }
   }
 
   @Override
-  public void addNetworkReqListener(NetworkReqListener listener, Selector<Message, ApplicationId>... selectors) {
+  public void addNetworkReqListener(Object listener, Selector<Message, ApplicationId>... selectors) {
     for (Selector<Message, ApplicationId> s : selectors) {
       selectorToNetListener.put(s, listener);
       ApplicationId ap = s.getMetaData();
@@ -241,14 +242,14 @@ public class NetworkImpl implements INetwork {
   }
 
   @Override
-  public NetworkReqListener getListener(IMessage message) {
+  public <T> T getListener(IMessage message, String... peerApplications) {
     if (message == null) {
       return null;
     }
     for (Selector<Message, ApplicationId> s : selectorToNetListener.keySet()) {
       boolean r = s.checkRule(message);
       if (r) {
-        return selectorToNetListener.get(s);
+        return (T) selectorToNetListener.get(s);
       }
     }
 
@@ -256,14 +257,24 @@ public class NetworkImpl implements INetwork {
     if (appId == null) {
       return null;
     }
+
+    boolean filter = false;
+    ConcurrentHashMap<ApplicationId, Object> filterAppId = new ConcurrentHashMap<>();
+    if (peerApplications != null && peerApplications.length > 0) {
+      filter = true;
+      appIdToNetListener.entrySet().stream()
+              .filter(applicationId -> Arrays.asList(peerApplications).contains(String.valueOf(applicationId.getKey().getAppId())))
+              .forEach(applicationIdObjectEntry -> filterAppId.put(applicationIdObjectEntry.getKey(), applicationIdObjectEntry.getValue()));
+    }
+
     if (appIdToNetListener.containsKey(commonAuthAppId)) {
-      return appIdToNetListener.get(commonAuthAppId);
+      return (T) (!filter ? appIdToNetListener : filterAppId).get(commonAuthAppId);
     }
     else if (appIdToNetListener.containsKey(commonAccAppId)) {
-      return appIdToNetListener.get(commonAccAppId);
+      return (T) (!filter ? appIdToNetListener : filterAppId).get(commonAccAppId);
     }
     else {
-      return appIdToNetListener.get(appId);
+      return (T) (!filter ? appIdToNetListener : filterAppId).get(appId);
     }
   }
 

@@ -58,6 +58,7 @@ import org.jdiameter.api.InternalException;
 import org.jdiameter.api.LocalAction;
 import org.jdiameter.api.Message;
 import org.jdiameter.api.NetworkReqListener;
+import org.jdiameter.api.NetworkMsgListener;
 import org.jdiameter.api.OverloadException;
 import org.jdiameter.api.PeerState;
 import org.jdiameter.api.ResultCode;
@@ -258,7 +259,7 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
         // Process cer
         Set<ApplicationId> newAppId = getCommonApplicationIds(message);
         if (newAppId.isEmpty()) {
-          if(logger.isWarnEnabled()) {
+          if (logger.isWarnEnabled()) {
             logger.warn("Processing CER failed, no common application. Message AppIds [{}]", message.getApplicationIdAvps());
           }
           return ResultCode.NO_COMMON_APPLICATION;
@@ -345,6 +346,12 @@ public class PeerImpl extends org.jdiameter.client.impl.controller.PeerImpl impl
 
       // we set the peer in the message so we can later reply directly
       message.setPeer(PeerImpl.this);
+
+      // apply other modifications and return new message
+      Object listener = network.getListener(message, applications.toArray(new String[]{}));
+      if (listener instanceof NetworkMsgListener) {
+        message = (IMessage) ((NetworkMsgListener) listener).processMessage(message);
+      }
 
       if (message.isRequest()) {
         IRequest req = message;

@@ -167,6 +167,7 @@
                 </xsi:complexType>
             </xsi:element>
         </xsi:sequence>
+        <xsi:attribute name="id" type="xsi:integer" use="optional"/>
     </xsi:complexType>
 
     <xsi:element name="Parameters" type="ParametersType">
@@ -353,6 +354,14 @@
                    <xsi:attribute name="value" type="xsi:string" use="required"/>
                </xsi:complexType>
             </xsi:element>
+            <xsi:element name="MaxConcurrentConnections" minOccurs="0" maxOccurs="1">
+                <xsi:annotation>
+                    <xsi:documentation>Max concurrent connections count</xsi:documentation>
+                </xsi:annotation>
+                <xsi:complexType>
+                    <xsi:attribute name="value" type="xsi:integer" use="required"/>
+                </xsi:complexType>
+            </xsi:element>
          </xsi:sequence>
     </xsi:complexType>
 
@@ -426,6 +435,7 @@
                     <xsi:attribute name="rating" type="xsi:integer" use="required"/>
                    <xsi:attribute name="standby_addresses" type="xsi:string" use="optional"/>
                    <xsi:attribute name="security_ref" type="xsi:string" use="optional"/>
+                   <xsi:attribute name="applications" type="xsi:string" use="optional"/>
                </xsi:complexType>
             </xsi:element>
         </xsi:sequence>

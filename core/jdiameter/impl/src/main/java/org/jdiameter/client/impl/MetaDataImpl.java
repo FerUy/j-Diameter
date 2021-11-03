@@ -42,17 +42,6 @@
 
 package org.jdiameter.client.impl;
 
-import static org.jdiameter.client.impl.helpers.Parameters.AcctApplId;
-import static org.jdiameter.client.impl.helpers.Parameters.ApplicationId;
-import static org.jdiameter.client.impl.helpers.Parameters.AuthApplId;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnDiameterURI;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnFirmwareRevision;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnIPAddress;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnProductName;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnRealm;
-import static org.jdiameter.client.impl.helpers.Parameters.OwnVendorID;
-import static org.jdiameter.client.impl.helpers.Parameters.VendorId;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryType;
@@ -86,6 +75,7 @@ import org.jdiameter.client.api.fsm.EventTypes;
 import org.jdiameter.client.api.io.IConnectionListener;
 import org.jdiameter.client.api.io.TransportException;
 import org.jdiameter.client.impl.helpers.IPConverter;
+import org.jdiameter.client.impl.helpers.Parameters;
 import org.jdiameter.common.api.data.ISessionDatasource;
 import org.jdiameter.common.api.statistic.IStatistic;
 import org.jdiameter.common.api.statistic.IStatisticManager;
@@ -94,12 +84,14 @@ import org.jdiameter.common.impl.controller.AbstractPeer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
+ /**
  * Use stack extension point
  *
  * @author erick.svenson@yahoo.com
  * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
  * @author <a href="mailto:brainslog@gmail.com"> Alexandre Mendonca </a>
+ * @author joram.herrera2@gmail.com
+ *
  */
 public class MetaDataImpl implements IMetaData {
 
@@ -261,7 +253,7 @@ public class MetaDataImpl implements IMetaData {
     @Override
     public URI getUri() {
       try {
-        return new URI(stack.getConfiguration().getStringValue(OwnDiameterURI.ordinal(), (String) OwnDiameterURI.defValue()));
+        return new URI(stack.getConfiguration().getStringValue(Parameters.OwnDiameterURI.ordinal(), (String) Parameters.OwnDiameterURI.defValue()));
       }
       catch (URISyntaxException e) {
         throw new IllegalArgumentException(e);
@@ -273,22 +265,22 @@ public class MetaDataImpl implements IMetaData {
 
     @Override
     public String getRealmName() {
-      return stack.getConfiguration().getStringValue(OwnRealm.ordinal(), (String) OwnRealm.defValue());
+      return stack.getConfiguration().getStringValue(Parameters.OwnRealm.ordinal(), (String) Parameters.OwnRealm.defValue());
     }
 
     @Override
     public long getVendorId() {
-      return stack.getConfiguration().getLongValue(OwnVendorID.ordinal(), (Long) OwnVendorID.defValue());
+      return stack.getConfiguration().getLongValue(Parameters.OwnVendorID.ordinal(), (Long) Parameters.OwnVendorID.defValue());
     }
 
     @Override
     public String getProductName() {
-      return stack.getConfiguration().getStringValue(OwnProductName.ordinal(), (String) OwnProductName.defValue());
+      return stack.getConfiguration().getStringValue(Parameters.OwnProductName.ordinal(), (String) Parameters.OwnProductName.defValue());
     }
 
     @Override
     public long getFirmware() {
-      return stack.getConfiguration().getLongValue(OwnFirmwareRevision.ordinal(), -1L);
+      return stack.getConfiguration().getLongValue(Parameters.OwnFirmwareRevision.ordinal(), -1L);
     }
 
     @Override
@@ -297,23 +289,24 @@ public class MetaDataImpl implements IMetaData {
         logger.debug("In getCommonApplications appIds size is [{}]", appIds.size());
       }
       if (appIds.isEmpty()) {
-        Configuration[] apps = stack.getConfiguration().getChildren(ApplicationId.ordinal());
+        Configuration[] apps = stack.getConfiguration().getChildren(Parameters.ApplicationId.ordinal());
         if (apps != null) {
           if (logger.isDebugEnabled()) {
             logger.debug("Stack configuration has apps list size of  [{}]. Looping through them", apps.length);
           }
           for (Configuration a : apps) {
-            long vnd = a.getLongValue(VendorId.ordinal(), 0L);
-            long auth = a.getLongValue(AuthApplId.ordinal(), 0L);
-            long acc = a.getLongValue(AcctApplId.ordinal(), 0L);
+            int id = a.getIntValue(Parameters.AppId.ordinal(), -1);
+            long vnd = a.getLongValue(Parameters.VendorId.ordinal(), 0L);
+            long auth = a.getLongValue(Parameters.AuthApplId.ordinal(), 0L);
+            long acc = a.getLongValue(Parameters.AcctApplId.ordinal(), 0L);
             if (logger.isDebugEnabled()) {
-              logger.debug("Adding app id vendor [{}] auth [{}] acc [{}]", new Object[]{vnd, auth, acc});
+              logger.debug("Adding app id [{}] vendor [{}] auth [{}] acc [{}]", new Object[]{(id == -1 ? "" : id), vnd, auth, acc});
             }
             if (auth != 0) {
-              appIds.add(org.jdiameter.api.ApplicationId.createByAuthAppId(vnd, auth));
+              appIds.add(org.jdiameter.api.ApplicationId.createByAuthAppId(vnd, auth).setAppId((id == -1 ? null : id)));
             }
             if (acc != 0) {
-              appIds.add(org.jdiameter.api.ApplicationId.createByAccAppId(vnd, acc));
+              appIds.add(org.jdiameter.api.ApplicationId.createByAccAppId(vnd, acc).setAppId((id == -1 ? null : id)));
             }
           }
         }
@@ -327,7 +320,7 @@ public class MetaDataImpl implements IMetaData {
     @Override
     public InetAddress[] getIPAddresses() {
       if (addresses.length == 0) {
-        String address = stack.getConfiguration().getStringValue(OwnIPAddress.ordinal(), null);
+        String address = stack.getConfiguration().getStringValue(Parameters.OwnIPAddress.ordinal(), null);
         if (address == null || address.length() == 0) {
           try {
             addresses = new InetAddress[]{InetAddress.getByName(getUri().getFQDN())};

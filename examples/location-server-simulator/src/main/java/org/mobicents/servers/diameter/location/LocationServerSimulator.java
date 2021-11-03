@@ -33,8 +33,8 @@ import org.mobicents.servers.diameter.location.data.SubscriberInformation;
 import org.mobicents.servers.diameter.location.points.SLgReferencePoint;
 import org.mobicents.servers.diameter.location.points.SLhReferencePoint;
 import org.mobicents.servers.diameter.location.points.ShReferencePoint;
-import org.mobicents.servers.diameter.utils.StackCreator;
 
+import org.mobicents.servers.diameter.utils.StackCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -128,7 +128,13 @@ public class LocationServerSimulator {
                     }
                     String locationEvent = request.queryParams("locationEvent");
                     String lcsReferenceNumber = request.queryParams("lcsReferenceNumber");
-                    return locationServerSimulator.sendLocationReportRequest(subscriberIdentity, locationEvent, lcsReferenceNumber, isImsi);
+                    if (lcsReferenceNumber != null) {
+                        if (Integer.valueOf(lcsReferenceNumber) >= 0)
+                            return locationServerSimulator.sendLocationReportRequest(subscriberIdentity, locationEvent, lcsReferenceNumber, isImsi);
+                        else
+                            return locationServerSimulator.sendLocationReportRequest(subscriberIdentity, locationEvent, null, isImsi);
+                    } else
+                        return locationServerSimulator.sendLocationReportRequest(subscriberIdentity, locationEvent, null, isImsi);
                 }
             });
 
@@ -225,7 +231,9 @@ public class LocationServerSimulator {
         String result = "\nLRR sent successfully!\n";
         try {
             Integer locationEventType = Integer.parseInt(locationEvent);
-            Integer referenceNumber = Integer.parseInt(lcsReferenceNumber);
+            Integer referenceNumber = null;
+            if (lcsReferenceNumber != null)
+                referenceNumber = Integer.parseInt(lcsReferenceNumber);
             this.slgMobilityManagementEntity.sendLocationReportRequest(subscriberIdentity, locationEventType, referenceNumber, isImsi);
         } catch (Exception e) {
             result = String.format("\nLRR caused an exception '%s' - not sent!\n", e.getMessage());

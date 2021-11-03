@@ -67,7 +67,6 @@ public class SCTPTransportClient {
   /**
    * Default constructor
    *
-   * @param concurrentFactory factory for create threads
    * @param parenConnection   connection created this transport
    */
   SCTPTransportClient(SCTPClientConnection parenConnection) {
@@ -96,7 +95,7 @@ public class SCTPTransportClient {
         this.management.start();
         this.management.setConnectDelay(1000); // Try connecting every 1 secs -- Note: 1st attempt is also delayed!
         // Clear any saved connections, we will get them from jdiameter-config.xml
-        this.management.removeAllResourses();
+        this.management.removeAllResources();
         logger.debug("Management initialized.");
       } else {
         logger.debug("Management already initialized.");

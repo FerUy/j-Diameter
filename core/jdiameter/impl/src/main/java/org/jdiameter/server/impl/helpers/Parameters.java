@@ -140,6 +140,11 @@ public class Parameters extends org.jdiameter.client.impl.helpers.Parameters {
 
   public static final Parameters RequestTableClearSize = new Parameters("RequestTableClearSize", Integer.class, new Integer(2048));
 
+  /**
+   * Capabilities Exchange Request <CER> custom Application-Id
+   */
+  public static final Parameters Applications = new Parameters("Applications", String.class);
+
   protected Parameters(String name, Class type) {
     super(name, type);
   }
@@ -147,4 +152,9 @@ public class Parameters extends org.jdiameter.client.impl.helpers.Parameters {
   protected Parameters(String name, Class type, Object defValue) {
     super(name, type, defValue);
   }
+
+  /**
+   *  MaxConcurrentConnections - specifies parameters of max concurrent connections count.
+   */
+  public static final Parameters MaxConcurrentConnections = new Parameters("MaxConcurrentConnections", Integer.class, new Integer(10));
 }

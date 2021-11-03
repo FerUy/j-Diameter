@@ -131,6 +131,35 @@ public class TLSClientConnection implements IConnection {
     }
   }
 
+  public TLSClientConnection(Configuration config, IConcurrentFactory concurrentFactory, InetAddress remoteAddress, int remotePort, InetAddress localAddress,
+                             int localPort, String[] extraHostAddresses, String standbyRemoteAddresses, IConnectionListener listener,
+                             IMessageParser parser, String ref) {
+    this.createdTime = System.currentTimeMillis();
+    this.listeners.add(listener);
+
+    this.client = new TLSTransportClient(this, concurrentFactory, parser);
+    this.client.setDestAddress(new InetSocketAddress(remoteAddress, remotePort));
+    this.client.setOrigAddress(new InetSocketAddress(localAddress, localPort));
+
+    if (extraHostAddresses != null && extraHostAddresses.length > 0) {
+      logger.warn("ExtraHostAddresses[{}] can't be bound to local server using TCP.", extraHostAddresses.length);
+    }
+    if (standbyRemoteAddresses != null && standbyRemoteAddresses.length() > 0) {
+      logger.warn("Secondary/stand-by remote connection [{}] not yet implemented over TCP.", standbyRemoteAddresses);
+    }
+
+    try {
+      if (ref == null) {
+        throw new Exception("Can not create connection without TLS parameters");
+      }
+      logger.trace("Initializing TLS with points '{}'", ref);
+      fillSecurityData(config, ref);
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
   public TLSClientConnection(Configuration config, Configuration localPeerSSLConfig, IConcurrentFactory concurrentFactory, Socket socket,
       IMessageParser parser) throws Exception {
     this.createdTime = System.currentTimeMillis();

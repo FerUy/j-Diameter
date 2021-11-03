@@ -47,8 +47,8 @@ import static org.mobicents.servers.diameter.utils.TBCDUtil.setAreaIdParams;
 import static org.mobicents.servers.diameter.utils.TBCDUtil.toTBCDString;
 
 /**
- * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  * @author <a href="mailto:aferreiraguido@gmail.com"> Alejandro Ferreira Guido </a>
+ * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
 public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkReqListener, EventListener<Request, Answer> {
 
@@ -156,7 +156,8 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
         ProvideLocationAnswer pla = new ProvideLocationAnswerImpl((Request) plr.getMessage(), resultCode);
         AvpSet plaAvpSet = pla.getMessage().getAvps();
 
-        if (resultCode == ResultCode.SUCCESS) {
+        if (resultCode == ResultCode.SUCCESS || resultCode == DIAMETER_ERROR_POSITIONING_FAILED ||
+            resultCode == DIAMETER_ERROR_POSITIONING_DENIED || resultCode == DIAMETER_ERROR_UNREACHABLE_USER) {
             try {
                 if (subscriberElement.locationEstimate != null || subscriberElement.addLocationEstimate !=null) {
                     if (subscriberElement.locationEstimate != null &&
@@ -211,9 +212,9 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 }
 
                 if (subscriberElement.eutranPositioningData != null) {
-                    byte[] etranPositioningDataBytes = {35, 92, 106, 25, 17};
-                    String etranPositioningDataString = new String(etranPositioningDataBytes);
-                    plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, etranPositioningDataString, 10415, true, false, true);
+                    byte[] eUtranPositioningDataBytes = {35, 92, 106, 25, 17};
+                    String eUtranPositioningDataString = new String(eUtranPositioningDataBytes);
+                    plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, eUtranPositioningDataString, 10415, true, false, true);
                     //plaAvpSet.addAvp(Avp.EUTRAN_POSITIONING_DATA, subscriberElement.eutranPositioningData, 10415, true, false, true);
                 }
 
@@ -271,14 +272,18 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
                 if (subscriberElement.plaFlags != null)
                     plaAvpSet.addAvp(Avp.PLA_FLAGS, subscriberElement.plaFlags, 10415, false, false, true);
 
-                if (subscriberElement.esmlcCellInfoEcgi != null && subscriberElement.esmlcCellInfoCpi != null) {
-                    AvpSet esmlcCellInfo = plaAvpSet.addGroupedAvp(Avp.ESMLC_CELL_INFO, 10415, false, false);
+                if (subscriberElement.esmlcCellInfoEcgi != null) {
                     String[] esmlcEcgiArray = subscriberElement.esmlcCellInfoEcgi.split("-");
                     Integer[] ecgiParams = setAreaIdParams(esmlcEcgiArray, "eUtranCellId");
                     EUtranCgiImpl ecgi = new EUtranCgiImpl();
                     ecgi.setData(ecgiParams[0], ecgiParams[1], ecgiParams[2]);
-                    esmlcCellInfo.addAvp(Avp.ECGI, ecgi.getData(), 10415, false, false);
-                    esmlcCellInfo.addAvp(Avp.CELL_PORTION_ID, subscriberElement.esmlcCellInfoCpi, 10415, false, false, true);
+                    if (subscriberElement.esmlcCellInfoCpi != null) {
+                        AvpSet esmlcCellInfo = plaAvpSet.addGroupedAvp(Avp.ESMLC_CELL_INFO, 10415, false, false);
+                        esmlcCellInfo.addAvp(Avp.ECGI, ecgi.getData(), 10415, false, false);
+                        esmlcCellInfo.addAvp(Avp.CELL_PORTION_ID, subscriberElement.esmlcCellInfoCpi, 10415, false, false, true);
+                    } else {
+                        plaAvpSet.addAvp(Avp.ECGI, ecgi.getData(), 10415, false, false);
+                    }
                 }
 
                 if (subscriberElement.civicAddress != null)
@@ -516,11 +521,6 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
             if (subscriberElement.lcsServiceTypeId != null)
                 lrrAvpSet.addAvp(Avp.LCS_SERVICE_TYPE_ID, subscriberElement.lcsServiceTypeId, 10415, true, false, true);
 
-            if (subscriberElement.pseudonymIndicator != null)
-                lrrAvpSet.addAvp(Avp.PSEUDONYM_INDICATOR, subscriberElement.pseudonymIndicator, 10415, false, false,true);
-
-            lrrAvpSet.addAvp(Avp.LCS_QOS_CLASS, subscriberElement.lcsQosClass, 10415, false, false, true);
-
             if (subscriberElement.servingNode != null) {
                 AvpSet servingNode = lrrAvpSet.addGroupedAvp(Avp.SERVING_NODE, 10415, false, false);
                 servingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.servingNode.sgsnNumber, 10415, false, false, true);
@@ -537,35 +537,58 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
             if (subscriberElement.lrrFlags != null)
                 lrrAvpSet.addAvp(Avp.LRR_FLAGS, subscriberElement.lrrFlags, 10415, false, false, true);
 
-            if (lcsReferenceNumber != null)
-                lrrAvpSet.addAvp(Avp.LCS_REFERENCE_NUMBER, lcsReferenceNumber, 10415, false, false, true);
+            if (lcsReferenceNumber != null) {
+                if (Integer.valueOf(lcsReferenceNumber) >= 0) {
+                    lrrAvpSet.addAvp(Avp.LCS_REFERENCE_NUMBER, lcsReferenceNumber, 10415, false, false, true);
 
-            if (subscriberElement.deferredMtLrDataServingNode != null) {
-                AvpSet deferredMtLrData = lrrAvpSet.addGroupedAvp(Avp.DEFERRED_MT_LR_DATA, 10415, false, false);
-                if (subscriberElement.deferredMtLrDataLocationType != null && subscriberElement.deferredMtLrDataTerminationCause != null) {
-                    deferredMtLrData.addAvp(Avp.DEFERRED_LOCATION_TYPE, subscriberElement.deferredMtLrDataLocationType,10415, false, false, true);
-                    deferredMtLrData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.deferredMtLrDataTerminationCause, 10415,false, false, true);
+                    if (subscriberElement.deferredMtLrDataServingNode != null) {
+                        AvpSet deferredMtLrData = lrrAvpSet.addGroupedAvp(Avp.DEFERRED_MT_LR_DATA, 10415, false, false);
+                        if (subscriberElement.deferredMtLrDataLocationType != null && subscriberElement.deferredMtLrDataTerminationCause != null) {
+                            deferredMtLrData.addAvp(Avp.DEFERRED_LOCATION_TYPE, subscriberElement.deferredMtLrDataLocationType,10415, false, false, true);
+                            deferredMtLrData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.deferredMtLrDataTerminationCause, 10415,false, false, true);
+                        }
+                        AvpSet deferredMtLrDataServingNode = deferredMtLrData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.deferredMtLrDataServingNode.sgsnNumber, 10415, false, false, true);
+                        deferredMtLrDataServingNode.addAvp(Avp.SGSN_NAME, subscriberElement.deferredMtLrDataServingNode.sgsnName, 10415, false, false, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.SGSN_REALM, subscriberElement.deferredMtLrDataServingNode.sgsnRealm, 10415, false, false, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.MME_NAME, subscriberElement.deferredMtLrDataServingNode.mmeName, 10415, false, false, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.MME_REALM, subscriberElement.deferredMtLrDataServingNode.mmeRealm, 10415, false, false, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.MSC_NUMBER, subscriberElement.deferredMtLrDataServingNode.mscNumber, 10415, false, false, true);
+                        deferredMtLrDataServingNode.addAvp(Avp.TGPP_AAA_SERVER_NAME, subscriberElement.deferredMtLrDataServingNode.tgppAAAServerName, 10415, false, false, false);
+                        deferredMtLrDataServingNode.addAvp(Avp.LCS_CAPABILITIES_SETS, subscriberElement.deferredMtLrDataServingNode.lcsCapabilitySets, 10415, false, false, true);
+                        deferredMtLrDataServingNode.addAvp(Avp.GMLC_ADDRESS, subscriberElement.deferredMtLrDataServingNode.gmlcAddress, 10415, false, false, false);
+                    }
+
+                    if (subscriberElement.reportingInterval != null && subscriberElement.reportingAmount != null) {
+                        AvpSet periodicLdrInformation = lrrAvpSet.addGroupedAvp(Avp.PERIODIC_LDR_INFORMATION, 10415, false, false);
+                        periodicLdrInformation.addAvp(Avp.REPORTING_INTERVAL, subscriberElement.reportingInterval, 10415, false, false, true);
+                        periodicLdrInformation.addAvp(Avp.REPORTING_AMOUNT, subscriberElement.reportingAmount,10415, false, false, true);
+                    }
+
+                    if (subscriberElement.delayedLocationDataServingNode != null) {
+                        AvpSet delayedLocationReportedData = lrrAvpSet.addGroupedAvp(DIAMETER_AVP_DELAYED_LOCATION_REPORTING_DATA, 10415, false, false);
+                        delayedLocationReportedData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.delayedLocationDataTerminationCause, 10415, false, false, true);
+                        AvpSet delayedLocationReportedDataservingNode = delayedLocationReportedData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.delayedLocationDataServingNode.sgsnNumber, 10415, false, false, true);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NAME, subscriberElement.delayedLocationDataServingNode.sgsnName, 10415, false, false, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_REALM, subscriberElement.delayedLocationDataServingNode.sgsnRealm, 10415, false, false, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.MME_NAME, subscriberElement.delayedLocationDataServingNode.mmeName, 10415, false, false, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.MME_REALM, subscriberElement.delayedLocationDataServingNode.mmeRealm, 10415, false, false, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.MSC_NUMBER, subscriberElement.delayedLocationDataServingNode.mscNumber, 10415, false, false, true);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.TGPP_AAA_SERVER_NAME, subscriberElement.delayedLocationDataServingNode.tgppAAAServerName, 10415, false, false, false);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.LCS_CAPABILITIES_SETS, subscriberElement.delayedLocationDataServingNode.lcsCapabilitySets, 10415, false, false, true);
+                        delayedLocationReportedDataservingNode.addAvp(Avp.GMLC_ADDRESS, subscriberElement.delayedLocationDataServingNode.gmlcAddress, 10415, false, false, false);
+                    }
+
+                    if (subscriberElement.pseudonymIndicator != null)
+                        lrrAvpSet.addAvp(Avp.PSEUDONYM_INDICATOR, subscriberElement.pseudonymIndicator, 10415, false, false,true);
+
+                    lrrAvpSet.addAvp(Avp.LCS_QOS_CLASS, subscriberElement.lcsQosClass, 10415, false, false, true);
                 }
-                AvpSet deferredMtLrDataServingNode = deferredMtLrData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
-                deferredMtLrDataServingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.deferredMtLrDataServingNode.sgsnNumber, 10415, false, false, true);
-                deferredMtLrDataServingNode.addAvp(Avp.SGSN_NAME, subscriberElement.deferredMtLrDataServingNode.sgsnName, 10415, false, false, false);
-                deferredMtLrDataServingNode.addAvp(Avp.SGSN_REALM, subscriberElement.deferredMtLrDataServingNode.sgsnRealm, 10415, false, false, false);
-                deferredMtLrDataServingNode.addAvp(Avp.MME_NAME, subscriberElement.deferredMtLrDataServingNode.mmeName, 10415, false, false, false);
-                deferredMtLrDataServingNode.addAvp(Avp.MME_REALM, subscriberElement.deferredMtLrDataServingNode.mmeRealm, 10415, false, false, false);
-                deferredMtLrDataServingNode.addAvp(Avp.MSC_NUMBER, subscriberElement.deferredMtLrDataServingNode.mscNumber, 10415, false, false, true);
-                deferredMtLrDataServingNode.addAvp(Avp.TGPP_AAA_SERVER_NAME, subscriberElement.deferredMtLrDataServingNode.tgppAAAServerName, 10415, false, false, false);
-                deferredMtLrDataServingNode.addAvp(Avp.LCS_CAPABILITIES_SETS, subscriberElement.deferredMtLrDataServingNode.lcsCapabilitySets, 10415, false, false, true);
-                deferredMtLrDataServingNode.addAvp(Avp.GMLC_ADDRESS, subscriberElement.deferredMtLrDataServingNode.gmlcAddress, 10415, false, false, false);
             }
 
             if (subscriberElement.gmlcAddress != null)
                 lrrAvpSet.addAvp(Avp.GMLC_ADDRESS, subscriberElement.gmlcAddress, 10415, false, false, true);
-
-            if (subscriberElement.reportingInterval != null && subscriberElement.reportingAmount != null) {
-                AvpSet periodicLdrInformation = lrrAvpSet.addGroupedAvp(Avp.PERIODIC_LDR_INFORMATION, 10415, false, false);
-                periodicLdrInformation.addAvp(Avp.REPORTING_INTERVAL, subscriberElement.reportingInterval, 10415, false, false, true);
-                periodicLdrInformation.addAvp(Avp.REPORTING_AMOUNT, subscriberElement.reportingAmount,10415, false, false, true);
-            }
 
             if (subscriberElement.esmlcCellInfoEcgi != null && subscriberElement.esmlcCellInfoCpi != null) {
                 AvpSet esmlcCellInfo = lrrAvpSet.addGroupedAvp(Avp.ESMLC_CELL_INFO, 10415, false, false);
@@ -579,21 +602,6 @@ public class SLgReferencePoint extends SLgSessionFactoryImpl implements NetworkR
 
             if (subscriberElement.oneXRttRcid != null)
                 lrrAvpSet.addAvp(Avp.ONEXRTT_RCID, subscriberElement.oneXRttRcid, 10415, false, false, true);
-
-            if (subscriberElement.delayedLocationDataServingNode != null) {
-                AvpSet delayedLocationReportedData = lrrAvpSet.addGroupedAvp(DIAMETER_AVP_DELAYED_LOCATION_REPORTING_DATA, 10415, false, false);
-                delayedLocationReportedData.addAvp(Avp.TERMINATION_CAUSE_LCS, subscriberElement.delayedLocationDataTerminationCause, 10415, false, false, true);
-                AvpSet delayedLocationReportedDataservingNode = delayedLocationReportedData.addGroupedAvp(Avp.SERVING_NODE, 10415, true, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NUMBER, subscriberElement.delayedLocationDataServingNode.sgsnNumber, 10415, false, false, true);
-                delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_NAME, subscriberElement.delayedLocationDataServingNode.sgsnName, 10415, false, false, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.SGSN_REALM, subscriberElement.delayedLocationDataServingNode.sgsnRealm, 10415, false, false, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.MME_NAME, subscriberElement.delayedLocationDataServingNode.mmeName, 10415, false, false, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.MME_REALM, subscriberElement.delayedLocationDataServingNode.mmeRealm, 10415, false, false, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.MSC_NUMBER, subscriberElement.delayedLocationDataServingNode.mscNumber, 10415, false, false, true);
-                delayedLocationReportedDataservingNode.addAvp(Avp.TGPP_AAA_SERVER_NAME, subscriberElement.delayedLocationDataServingNode.tgppAAAServerName, 10415, false, false, false);
-                delayedLocationReportedDataservingNode.addAvp(Avp.LCS_CAPABILITIES_SETS, subscriberElement.delayedLocationDataServingNode.lcsCapabilitySets, 10415, false, false, true);
-                delayedLocationReportedDataservingNode.addAvp(Avp.GMLC_ADDRESS, subscriberElement.delayedLocationDataServingNode.gmlcAddress, 10415, false, false, false);
-            }
 
             if (subscriberElement.civicAddress != null)
                 lrrAvpSet.addAvp(Avp.CIVIC_ADDRESS, subscriberElement.civicAddress, 10415, false, false,true);

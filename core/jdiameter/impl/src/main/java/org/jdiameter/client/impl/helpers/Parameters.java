@@ -205,7 +205,10 @@ public class Parameters extends Ordinal {
    * Realm property
    */
   public static final Parameters Realm = new Parameters("Realm", Object.class);
-
+  /**
+   * Id of element <ApplicationID />
+   */
+  public static final Parameters AppId = new Parameters("id", Integer.class);
   /**
    * Vendor id property
    */

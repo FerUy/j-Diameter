@@ -52,25 +52,25 @@ import org.mobicents.diameter.dictionary.AvpRepresentation;
  */
 public class ExampleServer implements NetworkReqListener {
   private static final Logger log = Logger.getLogger(ExampleServer.class);
-  static{
+  static {
 
     configLog4j();
 
-}
-
-private static void configLog4j() {
-  InputStream inStreamLog4j = ExampleServer.class.getClassLoader().getResourceAsStream("log4j.properties");
-  Properties propertiesLog4j = new Properties();
-  try {
-    propertiesLog4j.load(inStreamLog4j);
-    PropertyConfigurator.configure(propertiesLog4j);
-  } catch (Exception e) {
-    e.printStackTrace();
   }
 
-  log.debug("log4j configured");
+  private static void configLog4j() {
+    InputStream inStreamLog4j = ExampleServer.class.getClassLoader().getResourceAsStream("log4j.properties");
+    Properties propertiesLog4j = new Properties();
+    try {
+      propertiesLog4j.load(inStreamLog4j);
+      PropertyConfigurator.configure(propertiesLog4j);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-}
+    log.debug("log4j configured");
+
+  }
   private static final String configFile = "org/example/server/server-jdiameter-config.xml";
   private static final String dictionaryFile = "org/example/client/dictionary.xml";
   private static final String realmName = "exchange.example.org";
@@ -78,7 +78,7 @@ private static void configLog4j() {
   private static final int commandCode = 686;
   private static final long vendorID = 66666;
   private static final long applicationID = 33333;
-  private ApplicationId authAppId = ApplicationId.createByAuthAppId(applicationID);;
+  private ApplicationId authAppId = ApplicationId.createByAuthAppId(applicationID);
   private static final int exchangeTypeCode = 888;
   private static final int exchangeDataCode = 999;
   // enum values for Exchange-Type AVP
@@ -210,18 +210,18 @@ private static void configLog4j() {
       } else if (avpRep != null) {
         String value = "";
 
-        if (avpRep.getType().equals("Integer32"))
+        if (avpRep.getType().equals("Integer32")) {
           value = String.valueOf(avp.getInteger32());
-        else if (avpRep.getType().equals("Integer64") || avpRep.getType().equals("Unsigned64"))
+        } else if (avpRep.getType().equals("Integer64") || avpRep.getType().equals("Unsigned64")) {
           value = String.valueOf(avp.getInteger64());
-        else if (avpRep.getType().equals("Unsigned32"))
+        } else if (avpRep.getType().equals("Unsigned32")) {
           value = String.valueOf(avp.getUnsigned32());
-        else if (avpRep.getType().equals("Float32"))
+        } else if (avpRep.getType().equals("Float32")) {
           value = String.valueOf(avp.getFloat32());
-        else
+        } else {
           //value = avp.getOctetString();
           value = new String(avp.getOctetString(), StandardCharsets.UTF_8);
-
+        }
         log.info(prefix + "<avp name=\"" + avpRep.getName() + "\" code=\"" + avp.getCode() + "\" vendor=\"" + avp.getVendorId()
             + "\" value=\"" + value + "\" />");
       }
@@ -296,68 +296,68 @@ private static void configLog4j() {
     // to manipulate
     try {
       switch ((int) exchangeTypeAvp.getUnsigned32()) {
-      case EXCHANGE_TYPE_INITIAL:
-        // JIC check;
-        String data = exchangeDataAvp.getUTF8String();
-        this.session = this.factory.getNewSession(request.getSessionId());
-        if (data.equals(TO_RECEIVE[toReceiveIndex])) {
-          // create session;
+        case EXCHANGE_TYPE_INITIAL:
+          // JIC check;
+          String data = exchangeDataAvp.getUTF8String();
+          this.session = this.factory.getNewSession(request.getSessionId());
+          if (data.equals(TO_RECEIVE[toReceiveIndex])) {
+            // create session;
 
-          Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_INITIAL); // set
+            Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_INITIAL); // set
+                                                  // exchange
+                                                  // type
+                                                  // to
+                                                  // terminating
+            toReceiveIndex++;
+            dumpMessage(answer,true);
+            return answer;
+          } else {
+            log.error("Received wrong Exchange-Data: " + data);
+            Answer answer = request.createAnswer(6000);
+          }
+          break;
+        case EXCHANGE_TYPE_INTERMEDIATE:
+          // JIC check;
+          data = exchangeDataAvp.getUTF8String();
+          if (data.equals(TO_RECEIVE[toReceiveIndex])) {
+
+            Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_INTERMEDIATE); // set
+                                                  // exchange
+                                                  // type
+                                                  // to
+                                                  // terminating
+            toReceiveIndex++;
+            dumpMessage(answer,true);
+            return answer;
+          } else {
+            log.error("Received wrong Exchange-Data: " + data);
+          }
+          break;
+        case EXCHANGE_TYPE_TERMINATING:
+          data = exchangeDataAvp.getUTF8String();
+          if (data.equals(TO_RECEIVE[toReceiveIndex])) {
+            // good, we reached end of FSM.
+            finished = true;
+            // release session and its resources.
+            Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_TERMINATING); // set
                                                 // exchange
                                                 // type
                                                 // to
                                                 // terminating
-          toReceiveIndex++;
-          dumpMessage(answer,true);
-          return answer;
-        } else {
-          log.error("Received wrong Exchange-Data: " + data);
-          Answer answer = request.createAnswer(6000);
-        }
-        break;
-      case EXCHANGE_TYPE_INTERMEDIATE:
-        // JIC check;
-        data = exchangeDataAvp.getUTF8String();
-        if (data.equals(TO_RECEIVE[toReceiveIndex])) {
+            toReceiveIndex++;
+            this.session.release();
+            finished = true;
+            this.session = null;
+            dumpMessage(answer,true);
+            return answer;
 
-          Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_INTERMEDIATE); // set
-                                                // exchange
-                                                // type
-                                                // to
-                                                // terminating
-          toReceiveIndex++;
-          dumpMessage(answer,true);
-          return answer;
-        } else {
-          log.error("Received wrong Exchange-Data: " + data);
-        }
-        break;
-      case EXCHANGE_TYPE_TERMINATING:
-        data = exchangeDataAvp.getUTF8String();
-        if (data.equals(TO_RECEIVE[toReceiveIndex])) {
-          // good, we reached end of FSM.
-          finished = true;
-          // release session and its resources.
-          Answer answer = createAnswer(request, 2001, EXCHANGE_TYPE_TERMINATING); // set
-                                              // exchange
-                                              // type
-                                              // to
-                                              // terminating
-          toReceiveIndex++;
-          this.session.release();
-          finished = true;
-          this.session = null;
-          dumpMessage(answer,true);
-          return answer;
-
-        } else {
-          log.error("Received wrong Exchange-Data: " + data);
-        }
-        break;
-      default:
-        log.error("Bad value of Exchange-Type avp: " + exchangeTypeAvp.getUnsigned32());
-        break;
+          } else {
+            log.error("Received wrong Exchange-Data: " + data);
+          }
+          break;
+        default:
+          log.error("Bad value of Exchange-Type avp: " + exchangeTypeAvp.getUnsigned32());
+          break;
       }
     } catch (AvpDataException e) {
       // thrown when interpretation of byte[] fails
