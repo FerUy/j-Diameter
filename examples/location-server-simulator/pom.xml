@@ -19,8 +19,8 @@
     <!-- Restcomm properties -->
     <jss7.restcomm.version>7.4.0-102</jss7.restcomm.version>
     <!-- Mobicents Diameter Components Versions -->
-    <restcomm.diameter.jdiameter.version>1.7.1-157</restcomm.diameter.jdiameter.version>
-    <restcomm.diameter.mux.version>1.7.1-157</restcomm.diameter.mux.version>
+    <restcomm.diameter.jdiameter.version>1.7.4-SNAPSHOT</restcomm.diameter.jdiameter.version>
+    <restcomm.diameter.mux.version>1.7.4-SNAPSHOT</restcomm.diameter.mux.version>
     <!-- Thirdparty Dependencies Versions -->
     <slf4j.version>1.7.13</slf4j.version>
     <jbosscache.version>3.2.5.GA</jbosscache.version>
