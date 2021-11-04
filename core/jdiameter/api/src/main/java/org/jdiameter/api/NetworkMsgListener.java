@@ -24,7 +24,7 @@ package org.jdiameter.api;
 
 /**
  *
- * @author joram.herrera@paicbd.com
+ * @author <a href="joram.herrera2@gmail.com"> Joram Herrera </a>
  * @version 1.5.1 Final
  */
 public interface NetworkMsgListener {
